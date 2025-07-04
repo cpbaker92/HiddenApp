@@ -1,33 +1,41 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Pressable, StyleSheet, Animated, ToastAndroid } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-const WeeklyVerseScreen = () => {
-  const [showFullVerse, setShowFullVerse] = useState(true);
-  const [scale] = useState(new Animated.Value(1));
+const ReviewScreen = () => {
+  const [userInput, setUserInput] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [showAnswer, setShowAnswer] = useState(false);
 
   const verse = "Therefore go and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.";
   const firstLetterOnly = "TGAMDOANBTITNOTFSAHS.";
 
-  const handleDoubleTap = () => {
-    setShowFullVerse(prev => !prev);
-    Animated.sequence([
-      Animated.timing(scale, { toValue: 1.1, duration: 100, useNativeDriver: true }),
-      Animated.timing(scale, { toValue: 1, duration: 100, useNativeDriver: true }),
-    ]).start();
-    ToastAndroid.show(showFullVerse ? "First Letter Mode" : "Full Verse", ToastAndroid.SHORT);
+  const checkAnswer = () => {
+    const normalizedInput = userInput.toLowerCase().replace(/[^a-z]/g, '');
+    const normalizedVerse = verse.toLowerCase().replace(/[^a-z]/g, '');
+    if (normalizedInput === normalizedVerse) {
+      setFeedback('✅ Great job!');
+    } else {
+      setFeedback('❌ Not quite. Try again.');
+    }
+    setUserInput('');
   };
-
 
   return (
     <View style={styles.container}>
       <Text style={styles.referenceText}>Matthew 28:19</Text>
       {showAnswer && <Text style={styles.hintText}>{verse}</Text>}
       <Text style={styles.hintText}>{firstLetterOnly}</Text>
-      <Pressable onPress={handleDoubleTap}>
-        <Animated.Text style={[styles.verseText, { transform: [{ scale }] }]}>
-          {showFullVerse ? verse : firstLetterOnly}
-        </Animated.Text>
-      </Pressable>
+      <TextInput
+        style={styles.input}
+        value={userInput}
+        onChangeText={setUserInput}
+        placeholder="Type the verse here"
+      />
+      <Button title="Check Answer" onPress={checkAnswer} />
+      {feedback && <Text style={styles.feedbackText}>{feedback}</Text>}
+      {feedback.includes('❌') && (
+        <Button title="Show Answer" onPress={() => setShowAnswer(true)} />
+      )}
     </View>
   );
 };
@@ -39,13 +47,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#596487',
-  },
-  verseText: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 20,
-    fontFamily: 'Neue Haas Grotesk Display, sans-serif',
-    color: '#FFFFFF',
   },
   referenceText: {
     fontSize: 20,
@@ -76,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WeeklyVerseScreen;
+export default ReviewScreen;
