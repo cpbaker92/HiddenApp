@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../ThemeContext';
+import { darkTheme } from '../../theme';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 
 const SettingsScreen = () => {
