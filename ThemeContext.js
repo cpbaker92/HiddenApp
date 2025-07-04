@@ -6,20 +6,20 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [theme, setTheme] = useState(systemColorScheme);
+  const [themeMode, setThemeMode] = useState(systemColorScheme);
 
   useEffect(() => {
-    setTheme(systemColorScheme);
+    setThemeMode(systemColorScheme);
   }, [systemColorScheme]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const currentTheme = themeMode === 'dark' ? darkTheme : lightTheme;
 
   return (
-    <ThemeContext.Provider value={{ theme: currentTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: currentTheme }}>
       {children}
     </ThemeContext.Provider>
   );

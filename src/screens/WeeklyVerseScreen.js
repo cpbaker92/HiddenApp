@@ -6,7 +6,7 @@ const WeeklyVerseScreen = () => {
   const themeContext = useTheme();
 console.log('Theme context:', themeContext);
 console.log('useTheme():', useTheme());
-const { theme } = themeContext;
+const { theme } = themeContext || {};
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
   const [showAnswer, setShowAnswer] = useState(false);

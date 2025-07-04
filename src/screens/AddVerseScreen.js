@@ -3,7 +3,7 @@ import { useTheme } from '../../ThemeContext';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
 const AddVerseScreen = () => {
-  const { theme } = useTheme();
+  const { theme: currentTheme } = useTheme();
   const [verse, setVerse] = useState('');
 
   const handleAddVerse = () => {
@@ -13,14 +13,14 @@ const AddVerseScreen = () => {
   };
 
   return (
-<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: theme.backgroundColor }}>
-  <Text style={{ fontSize: 24, marginBottom: 20, color: theme.textColor }}>Add a New Verse</Text>
+<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: currentTheme.backgroundColor }}>
+  <Text style={{ fontSize: 24, marginBottom: 20, color: currentTheme.textColor }}>Add a New Verse</Text>
   <TextInput
-    style={{ height: 40, borderColor: theme.textColor, borderWidth: 1, marginBottom: 10, paddingHorizontal: 10, color: theme.textColor, width: '80%' }}
+    style={{ height: 40, borderColor: currentTheme.textColor, borderWidth: 1, marginBottom: 10, paddingHorizontal: 10, color: currentTheme.textColor, width: '80%' }}
     value={verse}
     onChangeText={setVerse}
     placeholder="Enter verse here"
-    placeholderTextColor={theme.textColor}
+    placeholderTextColor={currentTheme.textColor}
   />
   <Button title="Add Verse" onPress={handleAddVerse} />
 </View>
@@ -33,20 +33,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: theme.backgroundColor,
+    backgroundColor: currentTheme.backgroundColor,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color: theme.textColor,
+    color: currentTheme.textColor,
   },
   input: {
     height: 40,
-    borderColor: theme.textColor,
+    borderColor: currentTheme.textColor,
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: theme.textColor,
+    color: currentTheme.textColor,
     width: '80%',
   },
 });
