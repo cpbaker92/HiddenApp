@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTheme } from '../ThemeContext';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
 const ReviewScreen = () => {
+  const { theme } = useTheme();
   const [userInput, setUserInput] = useState('');
   const [feedback, setFeedback] = useState('');
   const [showAnswer, setShowAnswer] = useState(false);
@@ -46,34 +48,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#596487',
+    backgroundColor: theme.backgroundColor,
   },
   referenceText: {
     fontSize: 20,
     textAlign: 'center',
     marginBottom: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
   },
   hintText: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
   },
   input: {
     height: 40,
-    borderColor: '#FFFFFF',
+    borderColor: theme.textColor,
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
     width: '80%',
   },
   feedbackText: {
     fontSize: 18,
     textAlign: 'center',
     marginVertical: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
   },
 });
 
