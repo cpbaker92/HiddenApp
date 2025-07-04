@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTheme } from '../../ThemeContext';
-import { darkTheme } from '../../theme';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 
 const SettingsScreen = () => {
@@ -13,13 +12,13 @@ const SettingsScreen = () => {
       <Text style={styles.title}>Settings</Text>
       <View style={styles.switchContainer}>
         <Text>Dark Mode</Text>
-        <Text>{currentTheme === darkTheme ? 'Dark Mode' : 'Light Mode'}</Text>
+        <Text>{currentTheme.mode === 'dark' ? 'Dark Mode' : 'Light Mode'}</Text>
         <Switch
           trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={currentTheme === darkTheme ? "#f5dd4b" : "#f4f3f4"}
+          thumbColor={currentTheme.mode === 'dark' ? "#f5dd4b" : "#f4f3f4"}
           ios_backgroundColor="#3e3e3e"
           onValueChange={toggleSwitch}
-          value={currentTheme === darkTheme}
+          value={currentTheme.mode === 'dark'}
         />
       </View>
     </View>
