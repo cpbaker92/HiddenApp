@@ -3,10 +3,7 @@ import { useTheme } from '../../ThemeContext';
 import { View, Text, TextInput, Button, Pressable, StyleSheet, Animated, ToastAndroid } from 'react-native';
 
 const WeeklyVerseScreen = () => {
-  const themeContext = useTheme();
-console.log('Theme context:', themeContext);
-console.log('useTheme():', useTheme());
-const { theme } = themeContext || {};
+  const { theme } = useTheme();
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
   const [showAnswer, setShowAnswer] = useState(false);
