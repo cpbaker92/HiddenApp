@@ -1,18 +1,19 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import WeeklyVerseScreen from '../screens/WeeklyVerseScreen';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
-<Stack.Screen name="WeeklyVerse" component={WeeklyVerseScreen} />
-      </Stack.Navigator>
+      <Tab.Navigator initialRouteName="Verse">
+        <Tab.Screen name="Verse" component={WeeklyVerseScreen} />
+        <Tab.Screen name="Review" component={HomeScreen} />
+        <Tab.Screen name="Add" component={HomeScreen} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 };
