@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useVerseSettings } from '../../VerseSettingsContext';
 import { useTheme } from '../../ThemeContext';
 import {
   View,
@@ -9,13 +10,12 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-// Helper function to calculate current week's Sunday–Saturday range
+// Helper to format week range
 const getWeekRange = () => {
   const today = new Date();
-  const day = today.getDay(); // 0 = Sunday
+  const day = today.getDay();
   const sunday = new Date(today);
   const saturday = new Date(today);
-
   sunday.setDate(today.getDate() - day);
   saturday.setDate(today.getDate() + (6 - day));
 
@@ -28,8 +28,18 @@ const getWeekRange = () => {
   return `${format(sunday)} - ${format(saturday)}`;
 };
 
+// Helper to chunk first-letter string every 10 chars
+const chunkString = (str, size = 10) => {
+  const chunks = [];
+  for (let i = 0; i < str.length; i += size) {
+    chunks.push(str.slice(i, i + size));
+  }
+  return chunks.join('\n');
+};
+
 const WeeklyVerseScreen = () => {
   const { theme } = useTheme();
+  const { chunkSize } = useVerseSettings();
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
 
@@ -72,11 +82,15 @@ const WeeklyVerseScreen = () => {
         <Animated.Text
           style={[
             styles.verseText,
-            { transform: [{ scale }] },
-            { color: theme.textColor },
+            {
+              transform: [{ scale }],
+              color: theme.textColor,
+              fontSize: showFullVerse ? 24 : 32, // Increase font size for first-letter mode
+              lineHeight: showFullVerse ? 32 : 40,
+            },
           ]}
         >
-          {showFullVerse ? verse : firstLetterOnly}
+          {showFullVerse ? verse : chunkString(firstLetterOnly, chunkSize)}
         </Animated.Text>
       </Pressable>
 
@@ -101,19 +115,17 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 22,
-    fontWeight: '600',
-    fontFamily: undefined, // default system font
+    fontFamily: 'Rasa-Bold',
   },
   dateText: {
     fontSize: 14,
-    fontWeight: '400',
+    fontFamily: 'Rasa-Regular',
     marginTop: 4,
-    fontFamily: undefined, // default system font
   },
   verseText: {
-    fontSize: 24,
     textAlign: 'center',
     marginBottom: 20,
+    fontWeight: 'bold',
     fontFamily: 'Rasa-Bold',
     paddingHorizontal: 12,
   },

@@ -6,6 +6,7 @@ import * as Font from 'expo-font';
 import { AppRegistry, View } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ThemeProvider } from './ThemeContext';
+import { VerseSettingsProvider } from './VerseSettingsContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -48,11 +49,13 @@ export default function App() {
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <ThemeProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </ThemeProvider>
+      <VerseSettingsProvider>
+        <ThemeProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </ThemeProvider>
+      </VerseSettingsProvider>
     </View>
   );
 }
