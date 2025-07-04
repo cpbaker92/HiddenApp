@@ -33,20 +33,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: currentTheme.backgroundColor,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    color: currentTheme.textColor,
   },
   input: {
     height: 40,
-    borderColor: currentTheme.textColor,
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: currentTheme.textColor,
     width: '80%',
   },
 });
