@@ -1,5 +1,17 @@
 {
   "expo": {
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "web": {
+      "fonts": {
+        "Neue Haas Grotesk": "https://fonts.googleapis.com/css2?family=Neue+Haas+Grotesk:wght@400;700&display=swap",
+        "Merriweather": "https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap"
+      },
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
     "name": "Hidden",
     "slug": "Hidden",
     "version": "1.0.0",
@@ -17,11 +29,6 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",

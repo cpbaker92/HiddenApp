@@ -5,19 +5,18 @@ import { View, Text, Switch, StyleSheet } from 'react-native';
 const SettingsScreen = () => {
   const { theme: currentTheme, toggleTheme } = useTheme();
 
-  const toggleSwitch = () => toggleTheme();
+  const styles = getStyles(currentTheme);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Settings</Text>
       <View style={styles.switchContainer}>
-        <Text>Dark Mode</Text>
-        <Text>{currentTheme.mode === 'dark' ? 'Dark Mode' : 'Light Mode'}</Text>
+        <Text style={styles.label}>Dark Mode</Text>
         <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={currentTheme.mode === 'dark' ? "#f5dd4b" : "#f4f3f4"}
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={currentTheme.mode === 'dark' ? '#f5dd4b' : '#f4f3f4'}
           ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
+          onValueChange={toggleTheme}
           value={currentTheme.mode === 'dark'}
         />
       </View>
@@ -25,22 +24,30 @@ const SettingsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '80%',
-  },
-});
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: 24,
+      color: theme.textColor,
+      marginBottom: 20,
+    },
+    label: {
+      color: theme.textColor,
+      marginRight: 10,
+      fontSize: 16,
+    },
+    switchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '60%',
+    },
+  });
 
 export default SettingsScreen;

@@ -6,10 +6,10 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [themeMode, setThemeMode] = useState(systemColorScheme);
+  const [themeMode, setThemeMode] = useState(systemColorScheme || 'light');
 
   useEffect(() => {
-    setThemeMode(systemColorScheme);
+    setThemeMode(systemColorScheme || 'light');
   }, [systemColorScheme]);
 
   const toggleTheme = () => {
