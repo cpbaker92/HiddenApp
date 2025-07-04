@@ -13,17 +13,17 @@ const AddVerseScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add a New Verse</Text>
-      <TextInput
-        style={styles.input}
-        value={verse}
-        onChangeText={setVerse}
-        placeholder="Enter verse here"
-        placeholderTextColor={theme.textColor}
-      />
-      <Button title="Add Verse" onPress={handleAddVerse} />
-    </View>
+<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: theme.backgroundColor }}>
+  <Text style={{ fontSize: 24, marginBottom: 20, color: theme.textColor }}>Add a New Verse</Text>
+  <TextInput
+    style={{ height: 40, borderColor: theme.textColor, borderWidth: 1, marginBottom: 10, paddingHorizontal: 10, color: theme.textColor, width: '80%' }}
+    value={verse}
+    onChangeText={setVerse}
+    placeholder="Enter verse here"
+    placeholderTextColor={theme.textColor}
+  />
+  <Button title="Add Verse" onPress={handleAddVerse} />
+</View>
   );
 };
 

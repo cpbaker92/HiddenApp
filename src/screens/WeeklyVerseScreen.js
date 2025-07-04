@@ -3,7 +3,10 @@ import { useTheme } from '../../ThemeContext';
 import { View, Text, TextInput, Button, Pressable, StyleSheet, Animated, ToastAndroid } from 'react-native';
 
 const WeeklyVerseScreen = () => {
-  const { theme } = useTheme();
+  const themeContext = useTheme();
+console.log('Theme context:', themeContext);
+console.log('useTheme():', useTheme());
+const { theme } = themeContext;
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
   const [showAnswer, setShowAnswer] = useState(false);
@@ -63,22 +66,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
   },
   input: {
     height: 40,
-    borderColor: '#FFFFFF',
+    borderColor: theme.textColor,
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
     width: '80%',
   },
   feedbackText: {
     fontSize: 18,
     textAlign: 'center',
     marginVertical: 10,
-    color: '#FFFFFF',
+    color: theme.textColor,
   },
 });
 
