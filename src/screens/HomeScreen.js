@@ -1,7 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../ThemeContext';
 
 const HomeScreen = () => {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome to Hidden!</Text>
@@ -9,18 +13,19 @@ const HomeScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#596487',
-  },
-  text: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-});
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: {
+      color: theme.textColor,
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
+  });
 
 export default HomeScreen;
