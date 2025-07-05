@@ -12,7 +12,7 @@ const ReviewStack = createStackNavigator();
 
 const ReviewStackScreen = () => (
   <ReviewStack.Navigator screenOptions={{ headerShown: false }}>
-    <ReviewStack.Screen name="ReviewList" component={ReviewScreen} />
+    <ReviewStack.Screen name="Review" component={ReviewScreen} />
     <ReviewStack.Screen name="ReviewVerse" component={ReviewVerseScreen} />
   </ReviewStack.Navigator>
 );

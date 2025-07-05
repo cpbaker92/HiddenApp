@@ -99,4 +99,4 @@ const getStyles = (theme) =>
     },
   });
 
-export default ReviewVerseScreen;
+export default ReviewScreen;
