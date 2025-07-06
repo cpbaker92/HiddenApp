@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Animated, ToastAndroid } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../../ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import { useVerseSettings } from '../../VerseSettingsContext';
@@ -8,47 +8,11 @@ const ReviewScreen = () => {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const { chunkSize } = useVerseSettings();
-  const route = useRoute();
+
   const verses = [
     { reference: 'John 3:16', text: 'For God so loved the world...' },
-    // Add more verses as needed
+    // Add more verses here as needed
   ];
-
-  const [showFullVerse, setShowFullVerse] = useState(true);
-  const [scale] = useState(new Animated.Value(1));
-
-  const toFirstLetters = (text, size) => {
-    const letters = text
-      .split(' ')
-      .map((word) => word[0])
-      .join('');
-
-    const chunks = [];
-    for (let i = 0; i < letters.length; i += size) {
-      chunks.push(letters.slice(i, i + size));
-    }
-    return chunks.join('\n');
-  };
-
-  const handleDoubleTap = () => {
-    setShowFullVerse((prev) => !prev);
-    Animated.sequence([
-      Animated.timing(scale, {
-        toValue: 1.1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scale, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-    ToastAndroid.show(
-      !showFullVerse ? 'First Letter Mode' : 'Full Verse',
-      ToastAndroid.SHORT
-    );
-  };
 
   const styles = getStyles(theme);
 
@@ -58,6 +22,10 @@ const ReviewScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+      <Text style={[styles.title, { color: theme.textColor }]}>Review</Text>
+      <Text style={[styles.subtitle, { color: theme.textColor }]}>
+        Tap a verse below to review or test your memory.
+      </Text>
 
       {verses.map((verse, index) => (
         <Pressable
@@ -65,7 +33,7 @@ const ReviewScreen = () => {
           onPress={() => handlePress(verse.reference, verse.text)}
           style={styles.pressable}
         >
-          <Text style={[styles.headerText, { color: theme.textColor }]}>
+          <Text style={[styles.verseItem, { color: theme.textColor }]}>
             {verse.reference}
           </Text>
         </Pressable>
@@ -79,23 +47,30 @@ const getStyles = (theme) =>
     container: {
       flex: 1,
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: 16,
+      justifyContent: 'flex-start',
+      padding: 20,
     },
-    headerText: {
-      fontSize: 22,
-      fontFamily: 'Rasa-Bold',
-      marginBottom: 12,
+    title: {
+      fontSize: 26,
+      fontWeight: 'bold',
+      marginBottom: 10,
     },
-    verseText: {
-      fontSize: 24,
+    subtitle: {
+      fontSize: 16,
+      marginBottom: 20,
       textAlign: 'center',
-      fontFamily: 'Rasa-Regular',
-      paddingHorizontal: 12,
     },
     pressable: {
+      padding: 14,
+      marginVertical: 6,
+      borderRadius: 10,
+      backgroundColor: theme.mode === 'dark' ? '#2a2a2a' : '#f0f0f0',
+      width: '100%',
       alignItems: 'center',
-      paddingHorizontal: 16,
+    },
+    verseItem: {
+      fontSize: 18,
+      fontFamily: 'Rasa-Bold',
     },
   });
 

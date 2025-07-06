@@ -10,7 +10,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-// Helper to format week range
+// Format week range for header
 const getWeekRange = () => {
   const today = new Date();
   const day = today.getDay();
@@ -28,7 +28,6 @@ const getWeekRange = () => {
   return `${format(sunday)} - ${format(saturday)}`;
 };
 
-// Helper to chunk first-letter string every 10 chars
 const chunkString = (str, size = 10) => {
   const chunks = [];
   for (let i = 0; i < str.length; i += size) {
@@ -69,6 +68,7 @@ const WeeklyVerseScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+      {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={[styles.headerText, { color: theme.textColor }]}>
           Weekly Verse
@@ -78,25 +78,29 @@ const WeeklyVerseScreen = () => {
         </Text>
       </View>
 
-      <Pressable onPress={handleDoubleTap} style={styles.pressable}>
-        <Animated.Text
-          style={[
-            styles.verseText,
-            {
-              transform: [{ scale }],
-              color: theme.textColor,
-              fontSize: showFullVerse ? 24 : 32, // Increase font size for first-letter mode
-              lineHeight: showFullVerse ? 32 : 40,
-            },
-          ]}
-        >
-          {showFullVerse ? verse : chunkString(firstLetterOnly, chunkSize)}
-        </Animated.Text>
-      </Pressable>
+      {/* Verse */}
+      <View style={styles.verseContainer}>
+        <Pressable onPress={handleDoubleTap} style={styles.pressable}>
+          <Animated.Text
+            style={[
+              styles.verseText,
+              {
+                transform: [{ scale }],
+                color: theme.textColor,
+                fontSize: showFullVerse ? 24 : 32,
+                lineHeight: showFullVerse ? 32 : 40,
+              },
+            ]}
+          >
+            {showFullVerse ? verse : chunkString(firstLetterOnly, chunkSize)}
+          </Animated.Text>
+        </Pressable>
 
-      <Text style={[styles.referenceText, { color: theme.textColor }]}>
-        Matthew 28:19 (ESV)
-      </Text>
+        {/* Reference */}
+        <Text style={[styles.referenceText, { color: theme.textColor }]}>
+          Matthew 28:19 (ESV)
+        </Text>
+      </View>
     </View>
   );
 };
@@ -106,12 +110,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 48,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   headerContainer: {
-    position: 'absolute',
-    top: 16,
     alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 24,
   },
   headerText: {
     fontSize: 22,
@@ -122,17 +126,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Rasa-Regular',
     marginTop: 4,
   },
+  verseContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
   verseText: {
     textAlign: 'center',
-    marginBottom: 20,
     fontWeight: 'bold',
     fontFamily: 'Rasa-Bold',
-    paddingHorizontal: 12,
+    marginBottom: 20,
   },
   pressable: {
     alignItems: 'center',
     marginBottom: 10,
-    paddingHorizontal: 16,
   },
   referenceText: {
     fontSize: 18,
