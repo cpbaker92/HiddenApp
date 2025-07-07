@@ -35,7 +35,9 @@ const AddVerseScreen = () => {
         `https://api.scripture.api.bible/v1/bibles/${bibleId}/search?query=${q}&limit=1`,
         { headers: { 'api-key': API_KEY } }
       );
+      console.log('Search Response:', searchResponse);
       const searchResult = await searchResponse.json();
+      console.log('Search Result:', searchResult);
       if (!searchResult?.data?.verses?.length) {
         setError('Verse not found');
         return;
@@ -47,7 +49,9 @@ const AddVerseScreen = () => {
         `https://api.scripture.api.bible/v1/bibles/${bibleId}/passages?reference=${encodeURIComponent(ref)}&content-type=text`,
         { headers: { 'api-key': API_KEY } }
       );
+      console.log('Passage Response:', passageResponse);
       const passageJson = await passageResponse.json();
+      console.log('Passage JSON:', passageJson);
       if (passageResponse.ok && passageJson?.data?.content) {
         setVerseText(`${ref}\n\n${passageJson.data.content}`);
       } else {
@@ -56,6 +60,7 @@ const AddVerseScreen = () => {
     } catch (e) {
       console.error(e);
       setError('An error occurred while fetching the verse');
+      console.error('Fetch Error:', e);
     } finally {
       setLoading(false);
     }
@@ -80,7 +85,7 @@ const AddVerseScreen = () => {
       {verseText ? (
         <>
           <Text style={styles.text}>{verseText}</Text>
-          <Button title="Save Verse" onPress={() => ToastAndroid.show('Verse saved!', ToastAndroid.SHORT)} />
+          <Button title="Save Verse" onPress={() => ToastAndroid.show('Verse Saved!', ToastAndroid.SHORT)} />
         </>
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
