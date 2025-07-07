@@ -8,6 +8,7 @@ export const VerseSettingsProvider = ({ children }) => {
 
   // ✅ Add translation support
   const [translation, setTranslation] = useState('de4e12af7f28f599-02'); // ESV by default
+  const [letterMode, setLetterMode] = useState('one'); // New state for letter mode
 
   return (
     <VerseSettingsContext.Provider
@@ -18,6 +19,8 @@ export const VerseSettingsProvider = ({ children }) => {
         setChunkSize,
         translation,
         setTranslation,
+        letterMode, // Expose letterMode
+        setLetterMode, // Expose setLetterMode
       }}
     >
       {children}

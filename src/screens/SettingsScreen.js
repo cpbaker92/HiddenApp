@@ -7,7 +7,7 @@ import { useVerseSettings } from '../../VerseSettingsContext';
 
 const SettingsScreen = () => {
   const { theme, mode, toggleTheme } = useTheme();
-  const { chunkSize, setChunkSize, translation, setTranslation } = useVerseSettings();
+  const { chunkSize, setChunkSize, translation, setTranslation, letterMode, setLetterMode } = useVerseSettings();
 
   const styles = getStyles(theme, mode);
 
@@ -24,6 +24,23 @@ const SettingsScreen = () => {
           onValueChange={toggleTheme}
           value={mode === 'dark'}
         />
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.label}>Letter Prompt Mode</Text>
+        <Picker
+          selectedValue={letterMode}
+          onValueChange={setLetterMode}
+          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
+          dropdownIconColor={theme.textColor}
+        >
+          <Picker.Item label="1-Letter" value="one" />
+          <Picker.Item label="2-Letter" value="two" />
+          <Picker.Item label="3-Letter" value="three" />
+        </Picker>
+        <Text style={styles.helperText}>
+          Choose how many letters to display for each word in the verse.
+        </Text>
       </View>
 
       <View style={styles.card}>

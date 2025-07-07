@@ -16,7 +16,7 @@ import { StyleSheet } from 'react-native';
 
 const ReviewVerseScreen = () => {
   const navigation = useNavigation();
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
   const { chunkSize } = useVerseSettings();
   const route = useRoute();
   const { reference, text } = route.params || {};

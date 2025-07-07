@@ -1,7 +1,8 @@
+// App.js
 import React, { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import { NavigationContainer } from '@react-navigation/native'; // Import NavigationContainer
+import { NavigationContainer } from '@react-navigation/native';
 
 import { VerseSettingsProvider } from './VerseSettingsContext';
 import { ThemeProvider } from './ThemeContext';
@@ -41,12 +42,12 @@ export default function App() {
   }
 
   return (
-    <VerseSettingsProvider>
-      <ThemeProvider>
-        <NavigationContainer> {/* Wrap with NavigationContainer */}
+    <ThemeProvider> {/* ⬅️ Wrap ThemeProvider first */}
+      <VerseSettingsProvider>
+        <NavigationContainer>
           <AppNavigator />
         </NavigationContainer>
-      </ThemeProvider>
-    </VerseSettingsProvider>
+      </VerseSettingsProvider>
+    </ThemeProvider>
   );
 }

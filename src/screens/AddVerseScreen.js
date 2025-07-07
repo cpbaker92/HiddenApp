@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, Button,
-  ActivityIndicator, StyleSheet, ScrollView, ToastAndroid
+  View, Text, TextInput, ActivityIndicator,
+  StyleSheet, ScrollView, ToastAndroid, TouchableOpacity,
 } from 'react-native';
 import { fetchVerse } from '../../services/BibleAPI';
 import { useTheme } from '../../ThemeContext';
@@ -26,10 +26,7 @@ const AddVerseScreen = () => {
     setVerseText('');
 
     try {
-      console.log('Searching for:', query);
       const result = await fetchVerse(query, bibleId);
-      console.log('fetchVerse result:', result);
-
       if (result && result.content) {
         setVerseText(`${query}\n\n${result.content}`);
       } else {
@@ -55,17 +52,21 @@ const AddVerseScreen = () => {
         value={query}
         onChangeText={setQuery}
       />
-      <Button title="Search" onPress={handleSearch} />
+      <TouchableOpacity onPress={handleSearch} style={styles.button}>
+        <Text style={styles.buttonText}>Search</Text>
+      </TouchableOpacity>
 
       {loading && <ActivityIndicator size="large" color={theme.textColor} />}
 
       {verseText ? (
         <>
           <Text style={styles.text}>{verseText}</Text>
-          <Button
-            title="Save Verse"
+          <TouchableOpacity
             onPress={() => ToastAndroid.show('Verse Saved!', ToastAndroid.SHORT)}
-          />
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Save Verse</Text>
+          </TouchableOpacity>
         </>
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
@@ -88,7 +89,7 @@ const getStyles = (theme) =>
       borderRadius: 10,
       paddingHorizontal: 16,
       fontSize: 16,
-      backgroundColor: theme.mode === 'dark' ? '#333' : '#fff',
+      backgroundColor: mode === 'dark' ? '#333' : '#fff',
       borderColor: theme.textColor,
       borderWidth: 1,
       marginBottom: 12,
@@ -112,6 +113,18 @@ const getStyles = (theme) =>
       fontSize: 16,
       textAlign: 'center',
       marginVertical: 12,
+    },
+    button: {
+      backgroundColor: theme.primaryColor,
+      padding: 10,
+      borderRadius: 5,
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    buttonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
   });
 

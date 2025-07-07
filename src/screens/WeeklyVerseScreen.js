@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { fetchVerse } from '../../services/BibleAPI';
-import { useVerseSettings } from '../../VerseSettingsContext';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Animated,
+  ActivityIndicator,
+} from 'react-native';
 import { useTheme } from '../../ThemeContext';
-import { View, Text, Pressable, StyleSheet, Animated, Alert, ActivityIndicator } from 'react-native';
+import { useVerseSettings } from '../../VerseSettingsContext';
+import { fetchVerse } from '../../services/BibleAPI';
+import { convertToLetterPrompt } from '../utils/verseHelpers';
 
 // Format week range for header
 const getWeekRange = () => {
@@ -22,8 +30,7 @@ const getWeekRange = () => {
   return `${format(sunday)} - ${format(saturday)}`;
 };
 
-import { getFirstLetterMode } from '../../utils/textUtils';
-
+// Breaks a string into lines based on chunk size
 const chunkString = (str, size = 10) => {
   const chunks = [];
   for (let i = 0; i < str.length; i += size) {
@@ -33,11 +40,12 @@ const chunkString = (str, size = 10) => {
 };
 
 const WeeklyVerseScreen = () => {
-  const { theme } = useTheme();
-  const { chunkSize, translation } = useVerseSettings();
+  const { theme, mode } = useTheme();
+  const { chunkSize, translation, letterMode } = useVerseSettings();
+
   const [verse, setVerse] = useState('');
   const [reference, setReference] = useState('Matthew 28:19');
-  const [translationName, setTranslationName] = useState(''); // 👈 to show full name like NLT
+  const [translationName, setTranslationName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
@@ -47,10 +55,12 @@ const WeeklyVerseScreen = () => {
       setLoading(true);
       try {
         const response = await fetchVerse(reference, translation);
-        setVerse(response.content || '');
+        const cleaned = response.content.replace(/\d+\s*/g, '').trim(); // remove verse numbers
+        setVerse(cleaned);
         setTranslationName(response?.bibleName || '');
       } catch (error) {
         console.error('Error fetching verse:', error);
+        setVerse('Error loading verse.');
       } finally {
         setLoading(false);
       }
@@ -75,21 +85,18 @@ const WeeklyVerseScreen = () => {
     ]).start();
   };
 
-  const firstLetterOnly = chunkString(getFirstLetterMode(verse), chunkSize);
+  const prompt = convertToLetterPrompt(verse, letterMode);
+  const displayed = letterMode === 'one' ? chunkString(prompt, chunkSize) : prompt;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <Text style={[styles.headerText, { color: theme.textColor }]}>
-          Weekly Verse
-        </Text>
-        <Text style={[styles.dateText, { color: theme.textColor }]}>
-          {getWeekRange()}
-        </Text>
+        <Text style={[styles.headerText, { color: theme.textColor }]}>Weekly Verse</Text>
+        <Text style={[styles.dateText, { color: theme.textColor }]}>{getWeekRange()}</Text>
       </View>
 
-      {/* Verse */}
+      {/* Verse Display */}
       <View style={styles.verseContainer}>
         {loading ? (
           <ActivityIndicator size="large" color={theme.textColor} />
@@ -106,12 +113,12 @@ const WeeklyVerseScreen = () => {
                 },
               ]}
             >
-              {showFullVerse ? verse : firstLetterOnly}
+              {showFullVerse ? verse : displayed}
             </Animated.Text>
           </Pressable>
         )}
 
-        {/* Reference + Translation */}
+        {/* Reference and Translation */}
         <Text style={[styles.referenceText, { color: theme.textColor }]}>
           {reference} {translationName ? `(${translationName})` : ''}
         </Text>
