@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WeeklyVerseScreen from '../screens/WeeklyVerseScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ReviewVerseScreen from '../screens/ReviewVerseScreen';
+import AddVerseScreen from '../screens/AddVerseScreen'; // ✅ Make sure this is correctly imported
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
@@ -22,7 +23,7 @@ const AppNavigator = () => {
     <Tab.Navigator initialRouteName="Verse" screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Verse" component={WeeklyVerseScreen} />
       <Tab.Screen name="Review" component={ReviewStackScreen} />
-      <Tab.Screen name="Add" component={ReviewScreen} />
+      <Tab.Screen name="Add" component={AddVerseScreen} /> {/* ✅ Corrected line */}
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );

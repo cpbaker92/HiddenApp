@@ -19,7 +19,7 @@ const ReviewVerseScreen = () => {
   const { theme } = useTheme();
   const { chunkSize } = useVerseSettings();
   const route = useRoute();
-  const { reference, text } = route.params;
+  const { reference, text } = route.params || {};
 
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
