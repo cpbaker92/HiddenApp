@@ -97,13 +97,15 @@ export const fetchVerse = async (reference, translationId = 'de4e12af7f28f599-02
   });
 
   const data = await res.json();
+  console.log('Full API Response:', data);
 
   // API sometimes wraps text in HTML; we'll strip that using regex
   const stripHtmlTags = (html) => {
     return html.replace(/<\/?[^>]+(>|$)/g, '');
   };
 
-  const cleanedText = stripHtmlTags(data?.data?.content || '');
+  const content = data?.data?.content;
+  const cleanedText = content ? stripHtmlTags(content) : 'Verse not found.';
 
   return { ...data.data, content: cleanedText };
 };
