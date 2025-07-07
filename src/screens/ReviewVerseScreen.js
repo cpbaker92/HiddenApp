@@ -2,10 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
   Pressable,
-  StyleSheet,
   Animated,
   ToastAndroid,
   TouchableOpacity,
@@ -13,6 +10,9 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
+import { ThemedText } from '../../components/ThemedText';
+import { ThemedView } from '../../components/ThemedView';
+import { StyleSheet } from 'react-native';
 
 const ReviewVerseScreen = () => {
   const navigation = useNavigation();
@@ -60,30 +60,29 @@ const ReviewVerseScreen = () => {
   const styles = getStyles(theme);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+    <ThemedView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>Back</Text>
+          <ThemedText style={styles.backButton}>Back</ThemedText>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.textColor }]}>Review Verse</Text>
+        <ThemedText type="title" style={styles.headerTitle}>Review Verse</ThemedText>
       </View>
 
-      <Text style={[styles.headerText, { color: theme.textColor }]}>
+      <ThemedText type="title" style={styles.headerText}>
         {reference}
-      </Text>
+      </ThemedText>
 
       <Pressable onPress={handleDoubleTap} style={styles.pressable}>
         <Animated.Text
           style={[
             styles.verseText,
             { transform: [{ scale }] },
-            { color: theme.textColor },
           ]}
         >
           {showFullVerse ? text : toFirstLetters(text, chunkSize)}
         </Animated.Text>
       </Pressable>
-    </View>
+    </ThemedView>
   );
 };
 

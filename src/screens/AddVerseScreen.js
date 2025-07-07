@@ -4,6 +4,7 @@ import {
   ActivityIndicator, StyleSheet, ScrollView
 } from 'react-native';
 import { fetchVerse } from '../../services/BibleAPI';
+import { ToastAndroid } from 'react-native';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
 
@@ -79,7 +80,7 @@ const AddVerseScreen = () => {
       {verseText ? (
         <>
           <Text style={styles.text}>{verseText}</Text>
-          <Button title="Save Verse" onPress={() => { /* Save logic */ }} />
+          <Button title="Save Verse" onPress={() => ToastAndroid.show('Verse saved!', ToastAndroid.SHORT)} />
         </>
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
