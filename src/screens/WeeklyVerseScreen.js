@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchVerse } from '../../services/BibleAPI';
 import { useVerseSettings } from '../../VerseSettingsContext';
 import { useTheme } from '../../ThemeContext';
 import { View, Text, Pressable, StyleSheet, Animated, Alert, ActivityIndicator } from 'react-native';
@@ -21,6 +22,8 @@ const getWeekRange = () => {
   return `${format(sunday)} - ${format(saturday)}`;
 };
 
+import { getFirstLetterMode } from '../../utils/textUtils';
+
 const chunkString = (str, size = 10) => {
   const chunks = [];
   for (let i = 0; i < str.length; i += size) {
@@ -33,16 +36,19 @@ const WeeklyVerseScreen = () => {
   const { theme } = useTheme();
   const { chunkSize, translation } = useVerseSettings();
   const [verse, setVerse] = useState('');
+  const [reference, setReference] = useState('Matthew 28:19');
+  const [translationName, setTranslationName] = useState(''); // 👈 to show full name like NLT
   const [loading, setLoading] = useState(false);
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
 
   useEffect(() => {
-    const fetchVerse = async () => {
+    const fetchVerseData = async () => {
       setLoading(true);
       try {
-        const response = await getVerseText(translation);
-        setVerse(response);
+        const response = await fetchVerse(reference, translation);
+        setVerse(response.content || '');
+        setTranslationName(response?.bibleName || '');
       } catch (error) {
         console.error('Error fetching verse:', error);
       } finally {
@@ -50,9 +56,8 @@ const WeeklyVerseScreen = () => {
       }
     };
 
-    fetchVerse();
-  }, [translation]);
-  const firstLetterOnly = 'TGAMDOANBTITNOTFSAHS.';
+    fetchVerseData();
+  }, [translation, reference]);
 
   const handleDoubleTap = () => {
     setShowFullVerse((prev) => !prev);
@@ -68,11 +73,9 @@ const WeeklyVerseScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-    Alert.alert(
-      'Mode Changed',
-      !showFullVerse ? 'First Letter Mode' : 'Full Verse'
-    );
   };
+
+  const firstLetterOnly = chunkString(getFirstLetterMode(verse), chunkSize);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
@@ -92,25 +95,25 @@ const WeeklyVerseScreen = () => {
           <ActivityIndicator size="large" color={theme.textColor} />
         ) : (
           <Pressable onPress={handleDoubleTap} style={styles.pressable}>
-          <Animated.Text
-            style={[
-              styles.verseText,
-              {
-                transform: [{ scale }],
-                color: theme.textColor,
-                fontSize: showFullVerse ? 24 : 32,
-                lineHeight: showFullVerse ? 32 : 40,
-              },
-            ]}
-          >
-            {showFullVerse ? verse : chunkString(firstLetterOnly, chunkSize)}
-          </Animated.Text>
+            <Animated.Text
+              style={[
+                styles.verseText,
+                {
+                  transform: [{ scale }],
+                  color: theme.textColor,
+                  fontSize: showFullVerse ? 24 : 32,
+                  lineHeight: showFullVerse ? 32 : 40,
+                },
+              ]}
+            >
+              {showFullVerse ? verse : firstLetterOnly}
+            </Animated.Text>
           </Pressable>
         )}
 
-        {/* Reference */}
+        {/* Reference + Translation */}
         <Text style={[styles.referenceText, { color: theme.textColor }]}>
-          Matthew 28:19 (ESV)
+          {reference} {translationName ? `(${translationName})` : ''}
         </Text>
       </View>
     </View>
