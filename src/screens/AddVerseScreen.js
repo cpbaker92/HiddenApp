@@ -53,6 +53,7 @@ const AddVerseScreen = () => {
       <Text style={[styles.header, { color: theme.textColor }]}>
         Search for a verse to add
       </Text>
+
       <TextInput
         style={styles.input}
         placeholder="Enter verse (e.g., John 3:16)"
@@ -60,6 +61,7 @@ const AddVerseScreen = () => {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
+
       <Button title="Search" onPress={handleSearch} />
 
       {loading && <ActivityIndicator size="large" color={theme.textColor} />}
@@ -67,7 +69,7 @@ const AddVerseScreen = () => {
       {verseText ? (
         <>
           <Text style={styles.text}>{verseText}</Text>
-          <Button title="Save Verse" onPress={() => { /* Save logic to be implemented */ }} />
+          <Button title="Save Verse" onPress={() => { /* Save logic coming soon */ }} />
         </>
       ) : null}
 
@@ -96,7 +98,6 @@ const getStyles = (theme) =>
       borderColor: theme.textColor,
       borderWidth: 1,
       marginBottom: 12,
-      paddingHorizontal: 8,
       color: theme.textColor,
       width: '100%',
     },
