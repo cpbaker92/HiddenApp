@@ -1,25 +1,25 @@
-// src/screens/ReviewVerseScreen.js
-
 import React, { useState } from 'react';
 import {
+  View,
   Pressable,
   Animated,
   ToastAndroid,
   TouchableOpacity,
+  Text,
+  StyleSheet
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
 import { ThemedText } from '../../components/ThemedText';
 import { ThemedView } from '../../components/ThemedView';
-import { StyleSheet } from 'react-native';
 
 const ReviewVerseScreen = () => {
   const navigation = useNavigation();
   const { theme, mode } = useTheme();
   const { chunkSize } = useVerseSettings();
   const route = useRoute();
-  const { reference, text } = route.params || {};
+  const { reference, text, selectedMode } = route.params || {};
 
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
@@ -29,7 +29,6 @@ const ReviewVerseScreen = () => {
       .split(' ')
       .map((word) => word[0])
       .join('');
-
     const chunks = [];
     for (let i = 0; i < letters.length; i += size) {
       chunks.push(letters.slice(i, i + size));
@@ -52,9 +51,24 @@ const ReviewVerseScreen = () => {
       }),
     ]).start();
     ToastAndroid.show(
-      !showFullVerse ? 'First Letter Mode' : 'Full Verse',
+      !showFullVerse ? `${selectedMode} Mode` : 'Full Verse',
       ToastAndroid.SHORT
     );
+  };
+
+  const renderVerseByMode = () => {
+    switch (selectedMode) {
+      case 'Flashcard':
+        return showFullVerse ? 'Tap to reveal' : text;
+      case 'Prompt':
+        return showFullVerse ? text : toFirstLetters(text, chunkSize);
+      case 'Typing':
+        return 'Typing Mode: Type the verse from memory.';
+      case 'Quiz':
+        return 'Quiz Mode: Coming soon.';
+      default:
+        return text;
+    }
   };
 
   const styles = getStyles(theme);
@@ -69,17 +83,12 @@ const ReviewVerseScreen = () => {
       </View>
 
       <ThemedText type="title" style={styles.headerText}>
-        {reference}
+        {reference} ({selectedMode} Mode)
       </ThemedText>
 
       <Pressable onPress={handleDoubleTap} style={styles.pressable}>
-        <Animated.Text
-          style={[
-            styles.verseText,
-            { transform: [{ scale }] },
-          ]}
-        >
-          {showFullVerse ? text : toFirstLetters(text, chunkSize)}
+        <Animated.Text style={[styles.verseText, { transform: [{ scale }] }]}>
+          {renderVerseByMode()}
         </Animated.Text>
       </Pressable>
     </ThemedView>
@@ -117,6 +126,7 @@ const getStyles = (theme) =>
       fontFamily: 'Rasa-Bold',
       marginBottom: 12,
       marginTop: 100,
+      textAlign: 'center',
     },
     verseText: {
       fontSize: 24,
