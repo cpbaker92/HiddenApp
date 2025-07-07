@@ -1,5 +1,6 @@
 // services/BibleAPI.js
-const API_KEY = '2d6b7fbc2a1e78883e5630f0f9f81971'; // Replace securely later
+require('dotenv').config();
+const API_KEY = process.env.API_KEY;
 const BASE_URL = 'https://api.scripture.api.bible/v1';
 
 export const fetchVerse = async (reference, translationId = 'de4e12af7f28f599-02') => {

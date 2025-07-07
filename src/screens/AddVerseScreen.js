@@ -3,6 +3,7 @@ import {
   View, Text, TextInput, Button,
   ActivityIndicator, StyleSheet, ScrollView
 } from 'react-native';
+import { fetchVerse } from '../../services/BibleAPI';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
 
@@ -28,25 +29,26 @@ const AddVerseScreen = () => {
       const q = encodeURIComponent(query.trim());
 
       // 1️⃣ Search passgage reference
-      const sr = await fetch(
+      // 1️⃣ Search passage reference
+      const searchResponse = await fetch(
         `https://api.scripture.api.bible/v1/bibles/${bibleId}/search?query=${q}&limit=1`,
         { headers: { 'api-key': API_KEY } }
       );
-      const sj = await sr.json();
-      if (!sj?.data?.passages?.length) {
+      const searchResult = await searchResponse.json();
+      if (!searchResult?.data?.verses?.length) {
         setError('Verse not found');
         return;
       }
-      const ref = sj.data.passages[0].reference;
+      const ref = searchResult.data.verses[0].reference;
 
       // 2️⃣ Fetch plain text passage
-      const pr = await fetch(
+      const passageResponse = await fetch(
         `https://api.scripture.api.bible/v1/bibles/${bibleId}/passages?reference=${encodeURIComponent(ref)}&content-type=text`,
         { headers: { 'api-key': API_KEY } }
       );
-      const pj = await pr.json();
-      if (pr.ok && pj?.data?.content) {
-        setVerseText(`${ref}\n\n${pj.data.content}`);
+      const passageJson = await passageResponse.json();
+      if (passageResponse.ok && passageJson?.data?.content) {
+        setVerseText(`${ref}\n\n${passageJson.data.content}`);
       } else {
         setError('Could not load verse text');
       }
