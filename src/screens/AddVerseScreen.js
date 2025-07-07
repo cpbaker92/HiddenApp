@@ -26,16 +26,18 @@ const AddVerseScreen = () => {
     setVerseText('');
 
     try {
+      console.log('Searching for:', query);
       const result = await fetchVerse(query, bibleId);
       console.log('fetchVerse result:', result);
-      if (result?.content) {
+
+      if (result && result.content) {
         setVerseText(`${query}\n\n${result.content}`);
       } else {
-        setError('Verse not found');
+        setError('Verse not found.');
       }
     } catch (e) {
-      console.error('Error fetching verse:', e);
-      setError('An error occurred while fetching the verse');
+      console.error('Error in handleSearch:', e);
+      setError('An error occurred while fetching the verse.');
     } finally {
       setLoading(false);
     }

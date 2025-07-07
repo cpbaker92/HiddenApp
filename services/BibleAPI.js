@@ -1,11 +1,10 @@
 // services/BibleAPI.js
 import Constants from 'expo-constants';
 
-const extra = Constants.expoConfig?.extra || Constants.manifest?.extra || {};
-const API_KEY = extra.apiBibleKey;
+// TEMP: Hardcoded API key for testing
+const API_KEY = '2d6b7fbc2a1e78883e5630f0f9f81971';
 const BASE_URL = 'https://api.scripture.api.bible/v1';
 
-// Full list of book abbreviations
 const bookAbbreviations = {
   'Genesis': 'GEN',
   'Exodus': 'EXO',
@@ -26,7 +25,7 @@ const bookAbbreviations = {
   'Esther': 'EST',
   'Job': 'JOB',
   'Psalms': 'PSA',
-  'Psalm' : 'PSA',
+  'Psalm': 'PSA',
   'Proverbs': 'PRO',
   'Ecclesiastes': 'ECC',
   'Song of Solomon': 'SNG',
@@ -76,36 +75,53 @@ const bookAbbreviations = {
   'Revelation': 'REV',
 };
 
-// Converts a reference like 'Romans 2:12' to 'ROM.2.12'
+// Converts something like "JOHN 3:15" to "JHN.3.15"
+const toTitleCase = (str) => {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.length > 0 ? word[0].toUpperCase() + word.slice(1) : '')
+    .join(' ');
+};
+
 const formatVerseId = (reference) => {
   const [bookPart, chapterVerse] = reference.split(/ (?=\d)/); // split before the number
-  const abbreviation = bookAbbreviations[bookPart.trim()];
-  if (!abbreviation || !chapterVerse) return null;
+  const bookKey = toTitleCase(bookPart.trim());
+  const abbreviation = bookAbbreviations[bookKey];
+
+  if (!abbreviation || !chapterVerse) {
+    console.warn('Invalid reference format or book not found:', reference);
+    return null;
+  }
+
   return `${abbreviation}.${chapterVerse.replace(':', '.')}`;
 };
 
 export const fetchVerse = async (reference, translationId = 'de4e12af7f28f599-02') => {
   const verseId = formatVerseId(reference);
   if (!verseId) {
-    throw new Error('Invalid verse reference format');
+    throw new Error(`Invalid verse reference format: "${reference}"`);
   }
 
-  const res = await fetch(`${BASE_URL}/bibles/${translationId}/verses/${verseId}`, {
-    headers: {
-      'api-key': API_KEY,
-    },
+  const url = `${BASE_URL}/bibles/${translationId}/verses/${verseId}`;
+  console.log('Fetching verse from URL:', url);
+
+  const res = await fetch(url, {
+    headers: { 'api-key': API_KEY },
   });
 
   const data = await res.json();
-  console.log('Full API Response:', data);
+  console.log('Full API Response:', JSON.stringify(data, null, 2));
 
-  // API sometimes wraps text in HTML; we'll strip that using regex
   const stripHtmlTags = (html) => {
     return html.replace(/<\/?[^>]+(>|$)/g, '');
   };
 
   const content = data?.data?.content;
-  const cleanedText = content ? stripHtmlTags(content) : 'Verse not found.';
+  const cleanedText = content ? stripHtmlTags(content) : null;
 
-  return { ...data.data, content: cleanedText };
+  return {
+    ...data.data,
+    content: cleanedText || '',
+  };
 };
