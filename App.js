@@ -1,63 +1,40 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as SplashScreen from 'expo-splash-screen';
-import * as Font from 'expo-font';
-import { AppRegistry, View } from 'react-native';
-import AppNavigator from './src/navigation/AppNavigator';
-import { ThemeProvider } from './ThemeContext';
-import { VerseSettingsProvider } from './VerseSettingsContext';
-
-SplashScreen.preventAutoHideAsync();
-
-const Stack = createNativeStackNavigator();
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
   useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        'Rasa-Regular': require('./assets/fonts/Rasa-Regular.ttf'),
-        'Rasa-Bold': require('./assets/fonts/Rasa-Bold.ttf'),
-        'Rasa-SemiBold': require('./assets/fonts/Rasa-SemiBold.ttf'),
-        'Rasa-Medium': require('./assets/fonts/Rasa-Medium.ttf'),
-        'Rasa-Light': require('./assets/fonts/Rasa-Light.ttf'),
-        'Rasa-Italic': require('./assets/fonts/Rasa-Italic.ttf'),
-        'Rasa-BoldItalic': require('./assets/fonts/Rasa-BoldItalic.ttf'),
-        'Rasa-MediumItalic': require('./assets/fonts/Rasa-MediumItalic.ttf'),
-        'Rasa-LightItalic': require('./assets/fonts/Rasa-LightItalic.ttf'),
-        'Rasa-SemiBoldItalic': require('./assets/fonts/Rasa-SemiBoldItalic.ttf'),
+    registerForPushNotificationsAsync();
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log(notification);
+    });
 
-        // Add other custom fonts here if needed
-        'Merriweather': require('./assets/fonts/SpaceMono-Regular.ttf'), // Temporary fallback
-      });
-
-      setFontsLoaded(true);
-    }
-
-    loadFonts();
+    return () => subscription.remove();
   }, []);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+  async function registerForPushNotificationsAsync() {
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
     }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) return null;
+  }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <VerseSettingsProvider>
-        <ThemeProvider>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </ThemeProvider>
-      </VerseSettingsProvider>
+    <View>
+      <Text>Welcome to Hidden App!</Text>
     </View>
   );
 }
-
-AppRegistry.registerComponent('main', () => App);

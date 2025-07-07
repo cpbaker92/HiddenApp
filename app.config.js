@@ -6,7 +6,7 @@ export default {
     slug: "hidden-app",
     version: "1.0.0",
     extra: {
-      apiKey: process.env.API_KEY
+      apiBibleKey: process.env.API_BIBLE_KEY
     }
   }
 };

@@ -1,8 +1,9 @@
 // services/BibleAPI.js
 import Constants from 'expo-constants';
 
-// TEMP: Hardcoded API key for testing
-const API_KEY = '2d6b7fbc2a1e78883e5630f0f9f81971';
+const extra = Constants.expoConfig?.extra || Constants.manifest?.extra || {};
+const API_KEY = extra.apiBibleKey;
+console.log('Loaded API Key:', API_KEY);
 const BASE_URL = 'https://api.scripture.api.bible/v1';
 
 const bookAbbreviations = {

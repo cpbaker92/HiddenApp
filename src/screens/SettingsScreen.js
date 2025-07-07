@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { Picker } from '@react-native-picker/picker';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
 
 const SettingsScreen = () => {
   const { theme, mode, toggleTheme } = useTheme();
-  const { chunkSize, setChunkSize } = useVerseSettings();
+  const { chunkSize, setChunkSize, translation, setTranslation } = useVerseSettings();
 
   const styles = getStyles(theme, mode);
 
@@ -40,6 +41,23 @@ const SettingsScreen = () => {
         />
         <Text style={styles.helperText}>
           Adjust how many letters appear per line in First Letter Mode.
+        </Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.label}>Translation</Text>
+        <Picker
+          selectedValue={translation}
+          onValueChange={(itemValue) => setTranslation(itemValue)}
+          style={{ height: 50, width: 250, color: theme.textColor }}
+          dropdownIconColor={theme.textColor}
+        >
+          <Picker.Item label="English Standard Version (ESV)" value="de4e12af7f28f599-02" />
+          <Picker.Item label="King James Version (KJV)" value="06125adad2d5898a-01" />
+          <Picker.Item label="New International Version (NIV)" value="bba9f40183526463-01" />
+        </Picker>
+        <Text style={styles.helperText}>
+          This will affect all loaded verses across the app.
         </Text>
       </View>
     </View>

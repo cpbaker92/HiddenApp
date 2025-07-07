@@ -8,6 +8,8 @@ import ReviewVerseScreen from '../screens/ReviewVerseScreen';
 import AddVerseScreen from '../screens/AddVerseScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
+import { VerseSettingsProvider } from '../../VerseSettingsContext';
+
 const Tab = createBottomTabNavigator();
 const ReviewStack = createStackNavigator();
 
@@ -20,7 +22,7 @@ function ReviewStackScreen() {
   );
 }
 
-export default function AppNavigator() {
+function Navigator() {
   return (
     <Tab.Navigator initialRouteName="Verse" screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Verse" component={WeeklyVerseScreen} />
@@ -28,5 +30,13 @@ export default function AppNavigator() {
       <Tab.Screen name="Add" component={AddVerseScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
+  );
+}
+
+export default function AppNavigator() {
+  return (
+    <VerseSettingsProvider>
+      <Navigator />
+    </VerseSettingsProvider>
   );
 }
