@@ -1,14 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useVerseSettings } from '../../VerseSettingsContext';
 import { useTheme } from '../../ThemeContext';
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Animated,
-  ToastAndroid,
-} from 'react-native';
+import { View, Text, Pressable, StyleSheet, Animated, Alert, ActivityIndicator } from 'react-native';
 
 // Format week range for header
 const getWeekRange = () => {
@@ -38,12 +31,27 @@ const chunkString = (str, size = 10) => {
 
 const WeeklyVerseScreen = () => {
   const { theme } = useTheme();
-  const { chunkSize } = useVerseSettings();
+  const { chunkSize, translation } = useVerseSettings();
+  const [verse, setVerse] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showFullVerse, setShowFullVerse] = useState(true);
   const [scale] = useState(new Animated.Value(1));
 
-  const verse =
-    'Therefore go and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.';
+  useEffect(() => {
+    const fetchVerse = async () => {
+      setLoading(true);
+      try {
+        const response = await getVerseText(translation);
+        setVerse(response);
+      } catch (error) {
+        console.error('Error fetching verse:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVerse();
+  }, [translation]);
   const firstLetterOnly = 'TGAMDOANBTITNOTFSAHS.';
 
   const handleDoubleTap = () => {
@@ -60,9 +68,9 @@ const WeeklyVerseScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-    ToastAndroid.show(
-      !showFullVerse ? 'First Letter Mode' : 'Full Verse',
-      ToastAndroid.SHORT
+    Alert.alert(
+      'Mode Changed',
+      !showFullVerse ? 'First Letter Mode' : 'Full Verse'
     );
   };
 
@@ -80,7 +88,10 @@ const WeeklyVerseScreen = () => {
 
       {/* Verse */}
       <View style={styles.verseContainer}>
-        <Pressable onPress={handleDoubleTap} style={styles.pressable}>
+        {loading ? (
+          <ActivityIndicator size="large" color={theme.textColor} />
+        ) : (
+          <Pressable onPress={handleDoubleTap} style={styles.pressable}>
           <Animated.Text
             style={[
               styles.verseText,
@@ -94,7 +105,8 @@ const WeeklyVerseScreen = () => {
           >
             {showFullVerse ? verse : chunkString(firstLetterOnly, chunkSize)}
           </Animated.Text>
-        </Pressable>
+          </Pressable>
+        )}
 
         {/* Reference */}
         <Text style={[styles.referenceText, { color: theme.textColor }]}>
