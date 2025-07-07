@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WeeklyVerseScreen from '../screens/WeeklyVerseScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ReviewVerseScreen from '../screens/ReviewVerseScreen';
-import AddVerseScreen from '../screens/AddVerseScreen'; // ✅ Make sure this is correctly imported
+import AddVerseScreen from '../screens/AddVerseScreen'; // ✅ Correct import
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
