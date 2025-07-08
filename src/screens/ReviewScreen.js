@@ -31,16 +31,16 @@ const ReviewScreen = () => {
     let screen;
     switch (selectedMode) {
       case 'Flashcard':
-        screen = 'FlashcardModeScreen';
+        screen = 'FlashcardMode';
         break;
       case 'Typing':
-        screen = 'TypingModeScreen';
+        screen = 'TypingMode';
         break;
       case 'Quiz':
-        screen = 'QuizModeScreen';
+        screen = 'QuizMode';
         break;
       case 'Prompt':
-        screen = 'PromptModeScreen';
+        screen = 'PromptMode';
         break;
       default:
         screen = 'ReviewVerse';
