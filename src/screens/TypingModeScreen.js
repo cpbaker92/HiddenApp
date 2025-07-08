@@ -1,80 +1,286 @@
-// src/screens/TypingModeScreen.js
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  useColorScheme,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
-import React, { useState } from 'react';
-import { View, TextInput, Text, Button, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../ThemeContext';
-import { ThemedView } from '../../components/ThemedView';
-import { ThemedText } from '../../components/ThemedText';
+const TypingModeScreen = ({ route }) => {
+  const { verse = '', reference = '' } = route.params || {};
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
 
-const TypingModeScreen = () => {
-  const { theme } = useTheme();
-  const route = useRoute();
-  const navigation = useNavigation();
-  const { reference, text } = route.params || {};
+  const [userInput, setUserInput] = useState('');
+  const [wordResults, setWordResults] = useState([]);
+  const [verseWords, setVerseWords] = useState([]);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [showFullVerse, setShowFullVerse] = useState(false);
+  const [oneWordMode, setOneWordMode] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0);
+  const inputRef = useRef(null);
 
-  const [input, setInput] = useState('');
-  const [result, setResult] = useState(null);
+  const correctCount = wordResults.filter((r) => r === true).length;
 
-  const normalize = (str) =>
-    str.toLowerCase().replace(/[^a-z0-9]/gi, '');
+  const checkInput = () => {
+    const normalizedInput = userInput.trim().replace(/\s+/g, ' ');
+    const normalizedVerse = verse.trim().replace(/\s+/g, ' ');
 
-  const checkAnswer = () => {
-    const correct = normalize(text) === normalize(input);
-    setResult(correct ? 'Correct! 🎉' : 'Try Again ❌');
+    if (!normalizedInput || !normalizedVerse) {
+      setIsCorrect(false);
+      setWordResults([]);
+      return;
+    }
+
+    const inputWords = normalizedInput.split(' ');
+    const realVerseWords = normalizedVerse.split(' ');
+
+    setVerseWords(realVerseWords);
+
+    const results = realVerseWords.map((word, i) => {
+      if (!inputWords[i]) return false;
+      return inputWords[i].toLowerCase() === word.toLowerCase();
+    });
+
+    setWordResults(results);
+    const allCorrect = results.every((r) => r === true);
+    setIsCorrect(allCorrect);
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+  const reset = () => {
+    setUserInput('');
+    setWordResults([]);
+    setIsCorrect(null);
+    setWordIndex(0);
+    setVerseWords([]);
+  };
+
+  const handleOneWordSubmit = () => {
+    const currentWord = userInput.trim();
+    const expectedWord = verseWords[wordIndex];
+
+    const match = currentWord.toLowerCase() === expectedWord.toLowerCase();
+    const updatedResults = [...wordResults];
+    updatedResults[wordIndex] = match;
+    setWordResults(updatedResults);
+
+    const nextInput = wordIndex + 1 < verseWords.length ? '' : currentWord;
+    setUserInput(nextInput);
+    setWordIndex(wordIndex + 1);
+
+    if (wordIndex + 1 >= verseWords.length) {
+      const allCorrect = updatedResults.length === verseWords.length &&
+                         updatedResults.every((r) => r === true);
+      setIsCorrect(allCorrect);
+    }
+
+    inputRef.current?.focus();
+  };
+
+  const Button = ({ title, onPress, bgColor }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.button,
+        { backgroundColor: bgColor || (isDarkMode ? '#333' : '#596487') },
+      ]}
     >
-      <ThemedText type="title" style={styles.reference}>
-        {reference}
-      </ThemedText>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
+  );
 
-      <TextInput
-        placeholder="Type the verse from memory..."
-        placeholderTextColor={theme.textColor}
-        multiline
-        style={[styles.input, { color: theme.textColor, borderColor: theme.textColor }]}
-        value={input}
-        onChangeText={setInput}
-      />
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: isDarkMode ? '#1c1c1e' : '#fff' },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={[styles.reference, { color: isDarkMode ? '#fff' : '#000' }]}>
+          {reference}
+        </Text>
 
-      <Button title="Check Answer" onPress={checkAnswer} color={theme.primaryColor} />
+        <TextInput
+          ref={inputRef}
+          style={[
+            styles.input,
+            {
+              backgroundColor: isDarkMode ? '#2c2c2e' : '#f2f2f7',
+              color: isDarkMode ? '#fff' : '#000',
+              borderColor: isCorrect === false ? 'red' : '#ccc',
+            },
+          ]}
+          placeholder={
+            oneWordMode
+              ? `Word ${wordIndex + 1} of ${verseWords.length}...`
+              : 'Start typing the verse...'
+          }
+          placeholderTextColor={isDarkMode ? '#999' : '#888'}
+          multiline={!oneWordMode}
+          value={userInput}
+          onChangeText={setUserInput}
+          onSubmitEditing={oneWordMode ? handleOneWordSubmit : null}
+          blurOnSubmit={false}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
 
-      {result && <ThemedText style={styles.result}>{result}</ThemedText>}
+        <View style={styles.feedbackBox}>
+          {isCorrect !== null &&
+            verseWords.map((word, i) => {
+              const result = wordResults[i];
+              let color = isDarkMode ? '#aaa' : '#888';
 
-      <Button title="Back" onPress={() => navigation.goBack()} />
-    </KeyboardAvoidingView>
+              if (result === true) color = '#28a745'; // green
+              else if (result === false) color = '#dc3545'; // red
+
+              return (
+                <Text key={i} style={[styles.word, { color }]}>
+                  {word}{' '}
+                </Text>
+              );
+            })}
+        </View>
+
+        <View style={styles.buttonRow}>
+          {!oneWordMode && <Button title="Check" onPress={checkInput} />}
+          <Button title="Try Again" onPress={reset} bgColor={isDarkMode ? '#444' : '#aaa'} />
+        </View>
+
+        <View style={styles.extraRow}>
+          <TouchableOpacity onPress={() => setShowFullVerse(!showFullVerse)}>
+            <Text style={styles.link}>
+              {showFullVerse ? 'Hide Full Verse' : 'Show Full Verse'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setOneWordMode(!oneWordMode)}>
+            <Text style={styles.link}>
+              {oneWordMode ? 'Disable One Word Mode' : 'Enable One Word Mode'}
+            </Text>
+          </TouchableOpacity>
+
+          {isCorrect !== null && (
+            <Text style={styles.scoreText}>
+              {correctCount} of {verseWords.length} correct
+            </Text>
+          )}
+        </View>
+
+        {showFullVerse && (
+          <Text
+            style={[
+              styles.fullVerse,
+              { color: isDarkMode ? '#ccc' : '#444' },
+            ]}
+          >
+            {verse}
+          </Text>
+        )}
+
+        {isCorrect !== null && (
+          <Text
+            style={[
+              styles.resultText,
+              { color: isCorrect ? '#28a745' : '#dc3545' },
+            ]}
+          >
+            {isCorrect ? '✅ Perfect match!' : '❌ Not quite — try again'}
+          </Text>
+        )}
+
+        {isCorrect && <ConfettiCannon count={80} origin={{ x: 200, y: 0 }} fadeOut />}
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 
+export default TypingModeScreen;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   reference: {
-    fontSize: 22,
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 15,
     textAlign: 'center',
-    marginBottom: 20,
   },
   input: {
+    minHeight: 100,
     borderWidth: 1,
-    borderRadius: 8,
-    fontSize: 18,
     padding: 12,
-    height: 180,
+    fontSize: 16,
     marginBottom: 20,
+    borderRadius: 8,
     textAlignVertical: 'top',
   },
-  result: {
+  feedbackBox: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 20,
+  },
+  word: {
+    fontSize: 16,
+    marginRight: 4,
+    fontWeight: '500',
+  },
+  resultText: {
     fontSize: 18,
+    fontWeight: '600',
     textAlign: 'center',
-    marginVertical: 12,
+    marginTop: 15,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  extraRow: {
+    marginTop: 12,
+    flexDirection: 'column',
+    gap: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  link: {
+    color: '#596487',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  scoreText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#888',
+    marginTop: 4,
+  },
+  fullVerse: {
+    marginTop: 12,
+    textAlign: 'center',
+    fontSize: 16,
+    fontStyle: 'italic',
   },
 });
-
-export default TypingModeScreen;
