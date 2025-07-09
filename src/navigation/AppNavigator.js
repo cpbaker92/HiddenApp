@@ -58,7 +58,7 @@ function MainNavigator() {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Verse" component={WeeklyVerseScreen} />
-      <Tab.Screen name="Review" component={ReviewStackScreen} />
+      <Tab.Screen name="ReviewStack" component={ReviewStackScreen} />
       <Tab.Screen name="Add" component={AddVerseScreen} />
       <Tab.Screen name="Plans" component={VersePlansScreen} />
       <Tab.Screen name="Stats" component={VerseStatsScreen} />

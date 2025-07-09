@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useTheme } from '../../ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import { useVerseSettings } from '../../VerseSettingsContext';
@@ -12,16 +11,14 @@ const ReviewScreen = () => {
   const { theme, mode } = useTheme();
   const { chunkSize } = useVerseSettings();
 
-  const styles = getStyles(theme, mode);
+  const styles = getStyles(theme, mode, selectedMode);
+
+  const modes = ['Flashcard', 'Typing', 'Quiz', 'Prompt'];
 
   const verses = [
     { reference: 'John 3:16', text: 'For God so loved the world...' },
     // Add more verses here as needed
   ];
-
-  const handleModeChange = (event) => {
-    setSelectedMode(event.nativeEvent.value);
-  };
 
   const handlePress = (reference, text) => {
     if (reference && text) {
@@ -50,23 +47,24 @@ const ReviewScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      <Text style={[styles.subtitle, { color: theme.textColor }]}>
-        Choose a review mode:
-      </Text>
+      <View style={styles.modeSelector}>
+        {modes.map((modeName) => (
+          <TouchableOpacity
+            key={modeName}
+            onPress={() => setSelectedMode(modeName)}
+            style={[styles.modeButton, selectedMode === modeName && styles.selectedModeButton]}
+          >
+            <Text style={[styles.modeButtonText, selectedMode === modeName && styles.selectedModeText]}>
+              {modeName}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      <SegmentedControl
-        values={['Flashcard', 'Typing', 'Quiz', 'Prompt']}
-        selectedIndex={0}
-        onChange={handleModeChange}
-        style={styles.segmentedControl}
-      />
-
-      <Text style={[styles.subtitle, { color: theme.textColor }]}>
-        Tap a verse below to review or test your memory.
-      </Text>
+      <Text style={[styles.subtitle, { color: theme.textColor }]}>Tap a verse below to review or test your memory.</Text>
 
       {verses.map((verse, index) => (
-        <Animatable.View key={index} animation="fadeInUp" duration={600} delay={index * 150}>
+        <Animatable.View animation="bounceIn" duration={1500} key={index}>
           <Pressable
             onPress={() => handlePress(verse.reference, verse.text)}
             style={styles.pressable}
@@ -81,35 +79,56 @@ const ReviewScreen = () => {
   );
 };
 
-const getStyles = (theme, mode) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      padding: 20,
-    },
-    segmentedControl: {
-      marginBottom: 24,
-      width: '90%',
-    },
-    subtitle: {
-      fontSize: 16,
-      marginVertical: 8,
-      textAlign: 'center',
-    },
-    pressable: {
-      padding: 14,
-      marginVertical: 6,
-      borderRadius: 10,
-      backgroundColor: mode === 'dark' ? '#2a2a2a' : '#f0f0f0',
-      width: '100%',
-      alignItems: 'center',
-    },
-    verseItem: {
-      fontSize: 18,
-      fontFamily: 'Rasa-Bold',
-    },
-  });
+const getStyles = (theme, mode, selectedMode) => StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: 20,
+    paddingTop: 80,
+  },
+  modeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  modeButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#eee',
+    marginHorizontal: 5,
+  },
+  selectedModeButton: {
+    backgroundColor: '#596487',
+  },
+  modeButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  selectedModeText: {
+    color: '#fff',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  pressable: {
+    padding: 14,
+    marginVertical: 6,
+    borderRadius: 10,
+    backgroundColor: mode === 'dark' ? '#2a2a2a' : '#f0f0f0',
+    width: '100%',
+    alignItems: 'center',
+  },
+  verseItem: {
+    fontSize: 18,
+    fontFamily: 'Rasa-Bold',
+  },
+});
 
 export default ReviewScreen;
