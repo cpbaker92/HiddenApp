@@ -4,153 +4,203 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  useColorScheme,
 } from 'react-native';
-import { useTheme } from '../../ThemeContext';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
-const shuffleArray = (array) => {
-  return [...array].sort(() => Math.random() - 0.5);
-};
-
 const QuizModeScreen = () => {
-  const { theme } = useTheme();
-  const navigation = useNavigation();
   const route = useRoute();
+  const navigation = useNavigation();
   const { reference, text } = route.params || {};
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
 
-  const originalWords = text?.trim().split(/\s+/) || [];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [options, setOptions] = useState([]);
-  const [userProgress, setUserProgress] = useState([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [verseWords, setVerseWords] = useState([]);
+  const [shuffledChoices, setShuffledChoices] = useState([]);
+  const [userWords, setUserWords] = useState([]);
   const [feedback, setFeedback] = useState('');
+  const [selectedIncorrectWord, setSelectedIncorrectWord] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (currentIndex < originalWords.length) {
-      const correctWord = originalWords[currentIndex];
-      const incorrectWords = originalWords
-        .filter((word, i) => i !== currentIndex)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 3);
-      const allOptions = shuffleArray([correctWord, ...incorrectWords]);
-      setOptions(allOptions);
+    if (text) {
+      const words = text.trim().split(/\s+/);
+      setVerseWords(words);
+      setNextChoices(words, 0);
     }
-  }, [currentIndex]);
+  }, [text]);
+
+  const setNextChoices = (words, index) => {
+    if (index < words.length) {
+      const correctWord = words[index];
+      const otherWords = words.filter((_, i) => i !== index);
+      const shuffled = shuffleArray([
+        correctWord,
+        ...getRandomWords(otherWords, 3),
+      ]);
+      setShuffledChoices(shuffled);
+    }
+  };
+
+  const getRandomWords = (words, count) => {
+    const shuffled = [...words].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  const shuffleArray = (array) => {
+    return [...array].sort(() => Math.random() - 0.5);
+  };
 
   const handleWordPress = (word) => {
-    const correctWord = originalWords[currentIndex];
-    if (word === correctWord) {
-      setUserProgress([...userProgress, word]);
-      setCurrentIndex(currentIndex + 1);
+    if (word === verseWords[currentWordIndex]) {
+      const newUserWords = [...userWords, word];
+      setUserWords(newUserWords);
+      setCurrentWordIndex(currentWordIndex + 1);
       setFeedback('');
+      setSelectedIncorrectWord(null);
+
+      if (currentWordIndex + 1 === verseWords.length) {
+        setFeedback('Great job!');
+        setShowConfetti(true);
+      } else {
+        setNextChoices(verseWords, currentWordIndex + 1);
+      }
     } else {
       setFeedback('Try again!');
+      setSelectedIncorrectWord(word);
     }
   };
 
-  const getPrompt = () => {
-    return currentIndex === 0 ? 'Choose the first word:' : 'Choose the next word:';
+  const renderButton = (word, index) => {
+    const isIncorrect = feedback === 'Try again!' && selectedIncorrectWord === word;
+    return (
+      <TouchableOpacity
+        key={index}
+        style={[
+          styles.optionButton,
+          isIncorrect && styles.incorrectButton,
+        ]}
+        onPress={() => handleWordPress(word)}
+        disabled={feedback === 'Great job!'}
+      >
+        <Text style={styles.optionText}>{word}</Text>
+      </TouchableOpacity>
+    );
   };
 
-  const styles = getStyles(theme);
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.reference}>{reference}</Text>
-      <Text style={styles.prompt}>{getPrompt()}</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#000' : '#fff' },
+      ]}
+    >
+      <View style={styles.quizBox}>
+        <Text style={styles.reference}>{reference}</Text>
+        <Text style={styles.instruction}>
+          {currentWordIndex === 0
+            ? 'Choose the first word:'
+            : 'Choose the next word:'}
+        </Text>
 
-      <View style={styles.optionsContainer}>
-        {options.map((word, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => handleWordPress(word)}
-            style={styles.optionButton}
+        <View style={styles.choicesContainer}>
+          {shuffledChoices.map((word, index) => renderButton(word, index))}
+        </View>
+
+        <Text style={styles.progressText}>
+          Progress: {userWords.length} / {verseWords.length}
+        </Text>
+
+        {userWords.length > 0 && (
+          <Text style={styles.verseSoFar}>{userWords.join(' ')}</Text>
+        )}
+
+        {feedback !== '' && (
+          <Text
+            style={[
+              styles.feedbackText,
+              { color: feedback === 'Try again!' ? 'red' : 'green' },
+            ]}
           >
-            <Text style={styles.optionText}>{word}</Text>
-          </TouchableOpacity>
-        ))}
+            {feedback}
+          </Text>
+        )}
+
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
       </View>
 
-      <Text style={styles.progressText}>
-        Progress: {currentIndex} / {originalWords.length}
-      </Text>
-
-      {userProgress.length > 0 && (
-        <Text style={styles.builtVerse}>
-          Verse so far: {userProgress.join(' ')}
-        </Text>
+      {showConfetti && (
+        <ConfettiCannon count={80} origin={{ x: 200, y: 0 }} fadeOut />
       )}
-
-      {feedback ? <Text style={styles.feedback}>{feedback}</Text> : null}
-
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>Back</Text>
-      </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 };
 
-const getStyles = (theme) =>
-  StyleSheet.create({
-    container: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 24,
-      backgroundColor: theme.backgroundColor,
-    },
-    reference: {
-      fontSize: 22,
-      fontWeight: 'bold',
-      marginBottom: 12,
-      color: theme.textColor,
-    },
-    prompt: {
-      fontSize: 18,
-      marginBottom: 16,
-      color: theme.textColor,
-    },
-    optionsContainer: {
-      width: '100%',
-      flexDirection: 'column',
-      gap: 10,
-      alignItems: 'center',
-      marginBottom: 24,
-    },
-    optionButton: {
-      width: '90%',
-      padding: 12,
-      backgroundColor: '#e0e0e0',
-      borderRadius: 8,
-      alignItems: 'center',
-    },
-    optionText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: '#000',
-    },
-    progressText: {
-      fontSize: 14,
-      color: '#888',
-      marginBottom: 10,
-    },
-    builtVerse: {
-      fontSize: 16,
-      color: theme.textColor,
-      textAlign: 'center',
-      marginTop: 10,
-    },
-    feedback: {
-      fontSize: 16,
-      color: '#d32f2f',
-      marginTop: 8,
-    },
-    backButton: {
-      fontSize: 16,
-      color: '#007bff',
-      marginTop: 20,
-    },
-  });
-
 export default QuizModeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  quizBox: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reference: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  instruction: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  choicesContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  optionButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+    marginVertical: 6,
+    alignItems: 'center',
+  },
+  incorrectButton: {
+    backgroundColor: '#ffdddd',
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  optionText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  progressText: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  verseSoFar: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  feedbackText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#007bff',
+    marginTop: 10,
+  },
+});

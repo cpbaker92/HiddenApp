@@ -22,8 +22,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   image: {
-    width: '80%',
-    height: '80%',
+    width: '24%',
+    height: '24%',
   },
   text: {
     position: 'absolute',

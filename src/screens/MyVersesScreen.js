@@ -1,9 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons'; // for icons
 
-import HomeScreen from '../screens/HomeScreen'; // ✅ New import
+import HomeScreen from '../screens/HomeScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import ReviewVerseScreen from '../screens/ReviewVerseScreen';
 import FlashcardModeScreen from '../screens/FlashcardModeScreen';
@@ -27,18 +26,20 @@ function ReviewStackScreen() {
       screenOptions={{
         headerShown: false,
         animationEnabled: true,
-        cardStyleInterpolator: ({ current, layouts }) => ({
-          cardStyle: {
-            transform: [
-              {
-                translateX: current.progress.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [layouts.screen.width, 0],
-                }),
-              },
-            ],
-          },
-        }),
+        cardStyleInterpolator: ({ current, layouts }) => {
+          return {
+            cardStyle: {
+              transform: [
+                {
+                  translateX: current.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [layouts.screen.width, 0],
+                  }),
+                },
+              ],
+            },
+          };
+        },
       }}
     >
       <ReviewStack.Screen name="Review" component={ReviewScreen} />
@@ -54,48 +55,16 @@ function ReviewStackScreen() {
 function MainNavigator() {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          switch (route.name) {
-            case 'Home':
-              iconName = focused ? 'home' : 'home-outline';
-              break;
-            case 'MyVerses':
-              iconName = focused ? 'book' : 'book-outline';
-              break;
-            case 'Add':
-              iconName = focused ? 'add-circle' : 'add-circle-outline';
-              break;
-            case 'Plans':
-              iconName = focused ? 'list' : 'list-outline';
-              break;
-            case 'Stats':
-              iconName = focused ? 'bar-chart' : 'bar-chart-outline';
-              break;
-            case 'Settings':
-              iconName = focused ? 'settings' : 'settings-outline';
-              break;
-            default:
-              iconName = 'ellipse';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#2b4c7e',
-        tabBarInactiveTintColor: 'gray',
-        tabBarLabelStyle: { fontSize: 12 },
-      })}
+      initialRouteName="Verse"
+      screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="MyVerses" component={MyVersesScreen} />
+      <Tab.Screen name="MyVerses" component={MyVersesScreen} options={{ tabBarLabel: 'My Verses' }} />
       <Tab.Screen name="Add" component={AddVerseScreen} />
       <Tab.Screen name="Plans" component={VersePlansScreen} />
       <Tab.Screen name="Stats" component={VerseStatsScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Review" component={ReviewStackScreen} />
     </Tab.Navigator>
   );
 }

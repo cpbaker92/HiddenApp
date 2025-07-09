@@ -1,5 +1,6 @@
 // App.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Animated } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
@@ -12,14 +13,21 @@ import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   const [isReady, setIsReady] = React.useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const prepare = async () => {
       try {
         SplashScreen.preventAutoHideAsync();
-        await new Promise(resolve => setTimeout(resolve, 3000)); // wait 3 sec
-        setIsReady(true);
-        await SplashScreen.hideAsync();
+        await new Promise(resolve => setTimeout(resolve, 3700)); // wait 3.7 sec
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }).start(() => {
+          setIsReady(true);
+          SplashScreen.hideAsync();
+        });
       } catch (e) {
         console.warn(e);
       }
@@ -72,12 +80,18 @@ export default function App() {
 
 
   return (
-    <ThemeProvider>
-      <VerseSettingsProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </VerseSettingsProvider>
-    </ThemeProvider>
+    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+      {isReady ? (
+        <ThemeProvider>
+          <VerseSettingsProvider>
+            <NavigationContainer>
+              <AppNavigator />
+            </NavigationContainer>
+          </VerseSettingsProvider>
+        </ThemeProvider>
+      ) : (
+        <CustomSplashScreen />
+      )}
+    </Animated.View>
   );
 }
