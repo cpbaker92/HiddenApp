@@ -16,9 +16,7 @@ import VersePlansScreen from '../screens/VersePlansScreen';
 
 import { VerseSettingsProvider } from '../../VerseSettingsContext';
 
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 const ReviewStack = createStackNavigator();
 
 function ReviewStackScreen() {
@@ -58,7 +56,6 @@ function MainNavigator() {
     <Tab.Navigator
       initialRouteName="Verse"
       screenOptions={{ headerShown: false }}
-      barStyle={{ backgroundColor: '#ffffff' }}
     >
       <Tab.Screen name="Verse" component={WeeklyVerseScreen} />
       <Tab.Screen name="Review" component={ReviewStackScreen} />
