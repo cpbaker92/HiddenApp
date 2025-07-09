@@ -28,24 +28,28 @@ const ReviewScreen = () => {
   };
 
   const handlePress = (reference, text) => {
-    let screen;
-    switch (selectedMode) {
-      case 'Flashcard':
-        screen = 'FlashcardMode';
-        break;
-      case 'Typing':
-        screen = 'TypingMode';
-        break;
-      case 'Quiz':
-        screen = 'QuizMode';
-        break;
-      case 'Prompt':
-        screen = 'PromptMode';
-        break;
-      default:
-        screen = 'ReviewVerse';
+    if (reference && text) {
+      let screen;
+      switch (selectedMode) {
+        case 'Flashcard':
+          screen = 'FlashcardModeScreen';
+          break;
+        case 'Typing':
+          screen = 'TypingMode';
+          break;
+        case 'Quiz':
+          screen = 'QuizModeScreen';
+          break;
+        case 'Prompt':
+          screen = 'PromptModeScreen';
+          break;
+        default:
+          screen = 'ReviewVerseScreen';
+      }
+      navigation.navigate(screen, { reference, text });
+    } else {
+      console.error('Selected verse is missing reference or text');
     }
-    navigation.navigate(screen, { reference, text });
   };
 
   return (

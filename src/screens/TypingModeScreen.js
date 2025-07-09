@@ -22,8 +22,6 @@ const TypingModeScreen = ({ route }) => {
   const [verseWords, setVerseWords] = useState([]);
   const [isCorrect, setIsCorrect] = useState(null);
   const [showFullVerse, setShowFullVerse] = useState(false);
-  const [oneWordMode, setOneWordMode] = useState(false);
-  const [wordIndex, setWordIndex] = useState(0);
   const inputRef = useRef(null);
 
   const correctCount = wordResults.filter((r) => r === true).length;
@@ -35,52 +33,31 @@ const TypingModeScreen = ({ route }) => {
     if (!normalizedInput || !normalizedVerse) {
       setIsCorrect(false);
       setWordResults([]);
+      setVerseWords([]);
       return;
     }
 
     const inputWords = normalizedInput.split(' ');
-    const realVerseWords = normalizedVerse.split(' ');
+    const actualWords = normalizedVerse.split(' ');
 
-    setVerseWords(realVerseWords);
-
-    const results = realVerseWords.map((word, i) => {
-      if (!inputWords[i]) return false;
-      return inputWords[i].toLowerCase() === word.toLowerCase();
+    const results = actualWords.map((word, i) => {
+      return inputWords[i]?.toLowerCase() === word.toLowerCase();
     });
 
+    const isPerfect =
+      inputWords.length === actualWords.length &&
+      results.every((r) => r === true);
+
+    setVerseWords(actualWords);
     setWordResults(results);
-    const allCorrect = results.every((r) => r === true);
-    setIsCorrect(allCorrect);
+    setIsCorrect(isPerfect);
   };
 
   const reset = () => {
     setUserInput('');
     setWordResults([]);
-    setIsCorrect(null);
-    setWordIndex(0);
     setVerseWords([]);
-  };
-
-  const handleOneWordSubmit = () => {
-    const currentWord = userInput.trim();
-    const expectedWord = verseWords[wordIndex];
-
-    const match = currentWord.toLowerCase() === expectedWord.toLowerCase();
-    const updatedResults = [...wordResults];
-    updatedResults[wordIndex] = match;
-    setWordResults(updatedResults);
-
-    const nextInput = wordIndex + 1 < verseWords.length ? '' : currentWord;
-    setUserInput(nextInput);
-    setWordIndex(wordIndex + 1);
-
-    if (wordIndex + 1 >= verseWords.length) {
-      const allCorrect = updatedResults.length === verseWords.length &&
-                         updatedResults.every((r) => r === true);
-      setIsCorrect(allCorrect);
-    }
-
-    inputRef.current?.focus();
+    setIsCorrect(null);
   };
 
   const Button = ({ title, onPress, bgColor }) => (
@@ -118,26 +95,20 @@ const TypingModeScreen = ({ route }) => {
               borderColor: isCorrect === false ? 'red' : '#ccc',
             },
           ]}
-          placeholder={
-            oneWordMode
-              ? `Word ${wordIndex + 1} of ${verseWords.length}...`
-              : 'Start typing the verse...'
-          }
+          placeholder="Start typing the verse..."
           placeholderTextColor={isDarkMode ? '#999' : '#888'}
-          multiline={!oneWordMode}
+          multiline
           value={userInput}
           onChangeText={setUserInput}
-          onSubmitEditing={oneWordMode ? handleOneWordSubmit : null}
-          blurOnSubmit={false}
           autoCapitalize="none"
           autoCorrect={false}
         />
 
-        <View style={styles.feedbackBox}>
-          {isCorrect !== null &&
-            verseWords.map((word, i) => {
+        {isCorrect !== null && verseWords.length > 0 && (
+          <View style={styles.feedbackBox}>
+            {verseWords.map((word, i) => {
               const result = wordResults[i];
-              let color = isDarkMode ? '#aaa' : '#888';
+              let color = isDarkMode ? '#888' : '#aaa';
 
               if (result === true) color = '#28a745'; // green
               else if (result === false) color = '#dc3545'; // red
@@ -148,10 +119,11 @@ const TypingModeScreen = ({ route }) => {
                 </Text>
               );
             })}
-        </View>
+          </View>
+        )}
 
         <View style={styles.buttonRow}>
-          {!oneWordMode && <Button title="Check" onPress={checkInput} />}
+          <Button title="Check" onPress={checkInput} />
           <Button title="Try Again" onPress={reset} bgColor={isDarkMode ? '#444' : '#aaa'} />
         </View>
 
@@ -162,13 +134,7 @@ const TypingModeScreen = ({ route }) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setOneWordMode(!oneWordMode)}>
-            <Text style={styles.link}>
-              {oneWordMode ? 'Disable One Word Mode' : 'Enable One Word Mode'}
-            </Text>
-          </TouchableOpacity>
-
-          {isCorrect !== null && (
+          {isCorrect !== null && verseWords.length > 0 && (
             <Text style={styles.scoreText}>
               {correctCount} of {verseWords.length} correct
             </Text>
@@ -176,12 +142,7 @@ const TypingModeScreen = ({ route }) => {
         </View>
 
         {showFullVerse && (
-          <Text
-            style={[
-              styles.fullVerse,
-              { color: isDarkMode ? '#ccc' : '#444' },
-            ]}
-          >
+          <Text style={[styles.fullVerse, { color: isDarkMode ? '#ccc' : '#444' }]}>
             {verse}
           </Text>
         )}
