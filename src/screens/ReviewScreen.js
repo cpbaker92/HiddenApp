@@ -28,19 +28,19 @@ const ReviewScreen = () => {
       let screen;
       switch (selectedMode) {
         case 'Flashcard':
-          screen = 'FlashcardModeScreen';
+          screen = 'FlashcardMode';
           break;
         case 'Typing':
           screen = 'TypingMode';
           break;
         case 'Quiz':
-          screen = 'QuizModeScreen';
+          screen = 'QuizMode';
           break;
         case 'Prompt':
-          screen = 'PromptModeScreen';
+          screen = 'PromptMode';
           break;
         default:
-          screen = 'ReviewVerseScreen';
+          screen = 'ReviewVerse';
       }
       navigation.navigate(screen, { reference, text });
     } else {
@@ -50,6 +50,10 @@ const ReviewScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+      <Text style={[styles.subtitle, { color: theme.textColor }]}>
+        Choose a review mode:
+      </Text>
+
       <SegmentedControl
         values={['Flashcard', 'Typing', 'Quiz', 'Prompt']}
         selectedIndex={0}
@@ -62,15 +66,14 @@ const ReviewScreen = () => {
       </Text>
 
       {verses.map((verse, index) => (
-        <Animatable.View animation="bounceIn" duration={1500}>
+        <Animatable.View key={index} animation="fadeInUp" duration={600} delay={index * 150}>
           <Pressable
-          key={index}
-          onPress={() => handlePress(verse.reference, verse.text)}
-          style={styles.pressable}
-        >
-          <Text style={[styles.verseItem, { color: theme.textColor }]}>
-            {verse.reference}
-          </Text>
+            onPress={() => handlePress(verse.reference, verse.text)}
+            style={styles.pressable}
+          >
+            <Text style={[styles.verseItem, { color: theme.textColor }]}>
+              {verse.reference}
+            </Text>
           </Pressable>
         </Animatable.View>
       ))}
@@ -87,12 +90,12 @@ const getStyles = (theme, mode) =>
       padding: 20,
     },
     segmentedControl: {
-      marginVertical: 20,
+      marginBottom: 24,
       width: '90%',
     },
     subtitle: {
       fontSize: 16,
-      marginBottom: 20,
+      marginVertical: 8,
       textAlign: 'center',
     },
     pressable: {
