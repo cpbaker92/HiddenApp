@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet
-} from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useTheme } from '../../ThemeContext';
 import { useNavigation } from '@react-navigation/native';
@@ -66,7 +62,8 @@ const ReviewScreen = () => {
       </Text>
 
       {verses.map((verse, index) => (
-        <Pressable
+        <Animatable.View animation="bounceIn" duration={1500}>
+          <Pressable
           key={index}
           onPress={() => handlePress(verse.reference, verse.text)}
           style={styles.pressable}
@@ -74,7 +71,8 @@ const ReviewScreen = () => {
           <Text style={[styles.verseItem, { color: theme.textColor }]}>
             {verse.reference}
           </Text>
-        </Pressable>
+          </Pressable>
+        </Animatable.View>
       ))}
     </View>
   );

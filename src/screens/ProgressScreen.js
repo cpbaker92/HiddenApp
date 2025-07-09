@@ -1,4 +1,5 @@
 import React from 'react';
+import ProgressTracker from '../components/ProgressTracker';
 import { StyleSheet } from 'react-native';
 import { ThemedView } from '../../components/ThemedView';
 import { ThemedText } from '../../components/ThemedText';
@@ -10,6 +11,7 @@ const ProgressScreen = () => {
 
   return (
     <ThemedView style={styles.container}>
+      <ProgressTracker />
       <ThemedText type="title">Your Progress</ThemedText>
       <ThemedText>Track memorization streaks, quiz results, and verse completion stats here.</ThemedText>
     </ThemedView>

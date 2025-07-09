@@ -1,7 +1,9 @@
 // App.js
 import React, { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import CustomSplashScreen from './src/components/CustomSplashScreen';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { VerseSettingsProvider } from './VerseSettingsContext';
@@ -9,8 +11,22 @@ import { ThemeProvider } from './ThemeContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
+  const [isReady, setIsReady] = React.useState(false);
+
   useEffect(() => {
+    const prepare = async () => {
+      try {
+        SplashScreen.preventAutoHideAsync();
+        await new Promise(resolve => setTimeout(resolve, 3000)); // wait 3 sec
+        setIsReady(true);
+        await SplashScreen.hideAsync();
+      } catch (e) {
+        console.warn(e);
+      }
+    };
+    prepare();
     registerForPushNotificationsAsync();
+    scheduleDailyReminder();
 
     const subscription = Notifications.addNotificationReceivedListener(notification => {
       console.log('Notification Received:', notification);
@@ -41,8 +57,22 @@ export default function App() {
     }
   }
 
+  async function scheduleDailyReminder() {
+    const trigger = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    trigger.setHours(9, 0, 0);
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Time to Practice!",
+        body: "Don't forget to review your verses today.",
+      },
+      trigger,
+    });
+  }
+
+
   return (
-    <ThemeProvider> {/* ⬅️ Wrap ThemeProvider first */}
+    <ThemeProvider>
       <VerseSettingsProvider>
         <NavigationContainer>
           <AppNavigator />

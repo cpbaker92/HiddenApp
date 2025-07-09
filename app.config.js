@@ -8,6 +8,11 @@ export default {
     extra: {
       apiBibleKey: process.env.API_BIBLE_KEY
     },
+    splash: {
+      image: "./assets/images/splash-logo.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff"
+    },
     ios: {
       bundleIdentifier: "com.example.hiddenapp"
     }

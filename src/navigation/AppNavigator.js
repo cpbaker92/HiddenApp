@@ -16,12 +16,33 @@ import VersePlansScreen from '../screens/VersePlansScreen';
 
 import { VerseSettingsProvider } from '../../VerseSettingsContext';
 
-const Tab = createBottomTabNavigator();
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+
+const Tab = createMaterialBottomTabNavigator();
 const ReviewStack = createStackNavigator();
 
 function ReviewStackScreen() {
   return (
-    <ReviewStack.Navigator screenOptions={{ headerShown: false }}>
+    <ReviewStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animationEnabled: true,
+        cardStyleInterpolator: ({ current, layouts }) => {
+          return {
+            cardStyle: {
+              transform: [
+                {
+                  translateX: current.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [layouts.screen.width, 0],
+                  }),
+                },
+              ],
+            },
+          };
+        },
+      }}
+    >
       <ReviewStack.Screen name="Review" component={ReviewScreen} />
       <ReviewStack.Screen name="ReviewVerse" component={ReviewVerseScreen} />
       <ReviewStack.Screen name="FlashcardMode" component={FlashcardModeScreen} />
@@ -32,9 +53,13 @@ function ReviewStackScreen() {
   );
 }
 
-function Navigator() {
+function MainNavigator() {
   return (
-    <Tab.Navigator initialRouteName="Verse" screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      initialRouteName="Verse"
+      screenOptions={{ headerShown: false }}
+      barStyle={{ backgroundColor: '#ffffff' }}
+    >
       <Tab.Screen name="Verse" component={WeeklyVerseScreen} />
       <Tab.Screen name="Review" component={ReviewStackScreen} />
       <Tab.Screen name="Add" component={AddVerseScreen} />
@@ -48,7 +73,7 @@ function Navigator() {
 export default function AppNavigator() {
   return (
     <VerseSettingsProvider>
-      <Navigator />
+      <MainNavigator />
     </VerseSettingsProvider>
   );
 }
