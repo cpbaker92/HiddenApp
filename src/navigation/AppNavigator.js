@@ -1,4 +1,5 @@
 import React from 'react';
+import { VerseProvider } from '../VerseContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons'; // for icons
@@ -91,7 +92,8 @@ function MainNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="MyVerses" component={MyVersesScreen} />
+      <Tab.Screen name="Review" component={ReviewStackScreen} />
+<Tab.Screen name="MyVerses" component={MyVersesScreen} />
       <Tab.Screen name="Add" component={AddVerseScreen} />
       <Tab.Screen name="Plans" component={VersePlansScreen} />
       <Tab.Screen name="Stats" component={VerseStatsScreen} />
@@ -102,8 +104,10 @@ function MainNavigator() {
 
 export default function AppNavigator() {
   return (
-    <VerseSettingsProvider>
-      <MainNavigator />
-    </VerseSettingsProvider>
+    <VerseProvider>
+      <VerseSettingsProvider>
+        <MainNavigator />
+      </VerseSettingsProvider>
+    </VerseProvider>
   );
 }
