@@ -1,61 +1,86 @@
-// App.js
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-import { NavigationContainer } from '@react-navigation/native';
+import React from 'react';
+import { VerseProvider } from './src/VerseContext';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 
-import { VerseSettingsProvider } from './VerseSettingsContext';
-import { ThemeProvider } from './ThemeContext';
-import AppNavigator from './src/navigation/AppNavigator';
-import CustomSplashScreen from './src/components/CustomSplashScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import ReviewScreen from './src/screens/ReviewScreen';
+import TypingModeScreen from './src/screens/TypingModeScreen';
+import QuizModeScreen from './src/screens/QuizModeScreen';
+import PromptModeScreen from './src/screens/PromptModeScreen';
+import AddVerseScreen from './src/screens/AddVerseScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+import MyVersesScreen from './src/screens/MyVersesScreen';
+import VerseStatsScreen from './src/screens/VerseStatsScreen';
+import VersePlansScreen from './src/screens/VersePlansScreen';
 
-// Prevent auto hide until we're ready
-SplashScreen.preventAutoHideAsync();
+import { VerseSettingsProvider } from '../../VerseSettingsContext';
 
-export default function App() {
-  const [isAppReady, setAppReady] = useState(false);
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-  useEffect(() => {
-    const prepare = async () => {
-      try {
-        // Simulate loading tasks (fonts, data, etc.)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        setAppReady(true);
-      }
-    };
-
-    prepare();
-  }, []);
-
-  // ✅ Hide the splash once everything is ready and layout is complete
-  const onLayoutRootView = useCallback(async () => {
-    if (isAppReady) {
-      await SplashScreen.hideAsync();
-    }
-  }, [isAppReady]);
-
-  if (!isAppReady) {
-    return <CustomSplashScreen />;
-  }
-
+function MainTabs() {
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <ThemeProvider>
-        <VerseSettingsProvider>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </VerseSettingsProvider>
-      </ThemeProvider>
-    </View>
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          switch (route.name) {
+            case 'Home':
+              iconName = focused ? 'home' : 'home-outline';
+              break;
+            case 'MyVerses':
+              iconName = focused ? 'book' : 'book-outline';
+              break;
+            case 'Add':
+              iconName = focused ? 'add-circle' : 'add-circle-outline';
+              break;
+            case 'Plans':
+              iconName = focused ? 'list' : 'list-outline';
+              break;
+            case 'Stats':
+              iconName = focused ? 'bar-chart' : 'bar-chart-outline';
+              break;
+            case 'Settings':
+              iconName = focused ? 'settings' : 'settings-outline';
+              break;
+            default:
+              iconName = 'ellipse';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#2b4c7e',
+        tabBarInactiveTintColor: 'gray',
+        tabBarLabelStyle: { fontSize: 12 },
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="MyVerses" component={MyVersesScreen} />
+      <Tab.Screen name="Add" component={AddVerseScreen} />
+      <Tab.Screen name="Plans" component={VersePlansScreen} />
+      <Tab.Screen name="Stats" component={VerseStatsScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+export default function AppNavigator() {
+  return (
+    <VerseProvider>
+      <VerseSettingsProvider>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Review" component={ReviewScreen} />
+          <Stack.Screen name="TypingMode" component={TypingModeScreen} />
+          <Stack.Screen name="QuizMode" component={QuizModeScreen} />
+          <Stack.Screen name="PromptMode" component={PromptModeScreen} />
+        </Stack.Navigator>
+      </VerseSettingsProvider>
+    </VerseProvider>
+  );
+}

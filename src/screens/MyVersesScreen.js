@@ -8,21 +8,25 @@ import {
   TouchableOpacity,
   StyleSheet,
   Share,
+  Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-
 const groupVerses = (verses, showFavoritesOnly) => {
-  const sections = {};
+  const sections = {
+    'Recently Reviewed': [],
+  };
 
   verses.forEach((verse) => {
     if (showFavoritesOnly && !verse.isFavorite) return;
 
-    const book = verse.reference.split(' ')[0];
-    const group = verse.reviewed ? 'Recently Reviewed' : book;
-
-    if (!sections[group]) sections[group] = [];
-    sections[group].push(verse);
+    if (verse.reviewed) {
+      sections['Recently Reviewed'].push(verse);
+    } else {
+      const book = verse.reference.split(' ')[0];
+      if (!sections[book]) sections[book] = [];
+      sections[book].push(verse);
+    }
   });
 
   return Object.keys(sections).map((title) => ({
@@ -32,24 +36,30 @@ const groupVerses = (verses, showFavoritesOnly) => {
 };
 
 const MyVersesScreen = () => {
-  const { verses, toggleFavorite, updateVerseStatus, markAsReviewed } = useContext(VerseContext);
+  const { verses, toggleFavorite } = useContext(VerseContext);
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState({});
+  const [fadeAnim] = useState(new Animated.Value(0));
+
+  React.useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
   const handleVersePress = (verse) => {
-navigation.navigate('Review', {
-  screen: 'ReviewHome',
-  params: {
-    reference: verse.reference,
-    text: verse.text,
-  },
-});
+    navigation.navigate('Review', {
+      reference: verse.reference,
+      text: verse.text,
+    });
   };
 
   const handleLongPress = async (verse) => {
@@ -109,8 +119,7 @@ navigation.navigate('Review', {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Search + Filter Row */}
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <View style={styles.searchRow}>
         <TextInput
           style={styles.searchBar}
@@ -148,7 +157,7 @@ navigation.navigate('Review', {
           <Text style={styles.emptyText}>No verses found.</Text>
         }
       />
-    </View>
+    </Animated.View>
   );
 };
 
