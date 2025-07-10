@@ -6,8 +6,6 @@ import { Ionicons } from '@expo/vector-icons'; // for icons
 
 import HomeScreen from '../screens/HomeScreen'; // ✅ New import
 import ReviewScreen from '../screens/ReviewScreen';
-import ReviewVerseScreen from '../screens/ReviewVerseScreen';
-import FlashcardModeScreen from '../screens/FlashcardModeScreen';
 import TypingModeScreen from '../screens/TypingModeScreen';
 import QuizModeScreen from '../screens/QuizModeScreen';
 import PromptModeScreen from '../screens/PromptModeScreen';
@@ -19,6 +17,7 @@ import VersePlansScreen from '../screens/VersePlansScreen';
 
 import { VerseSettingsProvider } from '../../VerseSettingsContext';
 
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const ReviewStack = createStackNavigator();
 
@@ -42,9 +41,8 @@ function ReviewStackScreen() {
         }),
       }}
     >
-      <ReviewStack.Screen name="Review" component={ReviewScreen} />
-      <ReviewStack.Screen name="ReviewVerse" component={ReviewVerseScreen} />
-      <ReviewStack.Screen name="FlashcardMode" component={FlashcardModeScreen} />
+      <ReviewStack.Screen name="ReviewHome" component={ReviewScreen} />
+      <ReviewStack.Screen name="ReviewVerse" component={ReviewScreen} />
       <ReviewStack.Screen name="TypingMode" component={TypingModeScreen} />
       <ReviewStack.Screen name="QuizMode" component={QuizModeScreen} />
       <ReviewStack.Screen name="PromptMode" component={PromptModeScreen} />
@@ -52,7 +50,7 @@ function ReviewStackScreen() {
   );
 }
 
-function MainNavigator() {
+function MainTabs() {
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -92,7 +90,6 @@ function MainNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Review" component={ReviewStackScreen} />
 <Tab.Screen name="MyVerses" component={MyVersesScreen} />
       <Tab.Screen name="Add" component={AddVerseScreen} />
       <Tab.Screen name="Plans" component={VersePlansScreen} />
@@ -106,7 +103,10 @@ export default function AppNavigator() {
   return (
     <VerseProvider>
       <VerseSettingsProvider>
-        <MainNavigator />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Review" component={ReviewScreen} />
+        </Stack.Navigator>
       </VerseSettingsProvider>
     </VerseProvider>
   );

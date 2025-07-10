@@ -48,11 +48,9 @@ const HomeScreen = () => {
   }, [translation]);
 
   const toggleVerseMode = () => {
-    Animated.sequence([
-      Animated.timing(fadeAnim, { toValue: 0, duration: 150, useNativeDriver: true }),
-      Animated.timing(fadeAnim, { toValue: 1, duration: 150, useNativeDriver: true }),
-    ]).start(() => {
+    Animated.timing(fadeAnim, { toValue: 0.5, duration: 300, useNativeDriver: true }).start(() => {
       setShowFirstLetterMode(prev => !prev);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
     });
   };
 

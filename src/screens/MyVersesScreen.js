@@ -44,7 +44,7 @@ const MyVersesScreen = () => {
 
   const handleVersePress = (verse) => {
 navigation.navigate('Review', {
-  screen: 'ReviewVerse',
+  screen: 'ReviewHome',
   params: {
     reference: verse.reference,
     text: verse.text,
