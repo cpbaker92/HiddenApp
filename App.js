@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { VerseProvider } from './src/VerseContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -15,7 +16,7 @@ import MyVersesScreen from './src/screens/MyVersesScreen';
 import VerseStatsScreen from './src/screens/VerseStatsScreen';
 import VersePlansScreen from './src/screens/VersePlansScreen';
 
-import { VerseSettingsProvider } from '../../VerseSettingsContext';
+import { VerseSettingsProvider } from './VerseSettingsContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -71,8 +72,9 @@ function MainTabs() {
 
 export default function AppNavigator() {
   return (
-    <VerseProvider>
-      <VerseSettingsProvider>
+    <NavigationContainer>
+      <VerseProvider>
+        <VerseSettingsProvider>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="Review" component={ReviewScreen} />
@@ -80,7 +82,8 @@ export default function AppNavigator() {
           <Stack.Screen name="QuizMode" component={QuizModeScreen} />
           <Stack.Screen name="PromptMode" component={PromptModeScreen} />
         </Stack.Navigator>
-      </VerseSettingsProvider>
-    </VerseProvider>
+        </VerseSettingsProvider>
+      </VerseProvider>
+    </NavigationContainer>
   );
 }
