@@ -1,21 +1,61 @@
-import React from 'react';
-import { View, Text, Switch, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  Switch,
+  StyleSheet,
+  Platform,
+  Modal,
+  Pressable,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import Slider from '@react-native-community/slider';
-import { Picker } from '@react-native-picker/picker';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
 
+const translationNames = {
+  'de4e12af7f28f599-02': 'English Standard Version (ESV)',
+  '06125adad2d5898a-01': 'King James Version (KJV)',
+  'bba9f40183526463-01': 'New International Version (NIV)',
+  '46eecb412d56dfb7-02': 'Christian Standard Bible (CSB)',
+  'fa0eeb8af176a5c0-01': 'New Living Translation (NLT)',
+};
+
+const letterModes = ['one', 'two', 'three'];
+const letterModeLabels = {
+  one: '1-Letter',
+  two: '2-Letter',
+  three: '3-Letter',
+};
+
+const translationOptions = Object.entries(translationNames)
+  .map(([value, label]) => ({ label, value }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
 const SettingsScreen = () => {
   const { theme, mode, toggleTheme } = useTheme();
-  const { chunkSize, setChunkSize, translation, setTranslation, letterMode, setLetterMode } = useVerseSettings();
+  const {
+    chunkSize,
+    setChunkSize,
+    translation,
+    setTranslation,
+    letterMode,
+    setLetterMode,
+  } = useVerseSettings();
 
   const styles = getStyles(theme, mode);
+
+  const [letterModalVisible, setLetterModalVisible] = useState(false);
+  const [translationModalVisible, setTranslationModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Settings</Text>
 
-      <View style={styles.card}>
+      <Text style={styles.sectionHeader}>PREFERENCES</Text>
+
+      <View style={styles.settingRow}>
         <Text style={styles.label}>Dark Mode</Text>
         <Switch
           trackColor={{ false: '#d3d3d3', true: '#ffffff' }}
@@ -26,27 +66,20 @@ const SettingsScreen = () => {
         />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Letter Prompt Mode</Text>
-        <Picker
-          selectedValue={letterMode}
-          onValueChange={setLetterMode}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          dropdownIconColor={theme.textColor}
-        >
-          <Picker.Item label="1-Letter" value="one" />
-          <Picker.Item label="2-Letter" value="two" />
-          <Picker.Item label="3-Letter" value="three" />
-        </Picker>
-        <Text style={styles.helperText}>
-          Choose how many letters to display for each word in the verse.
-        </Text>
-      </View>
+      <TouchableOpacity
+        onPress={() => setLetterModalVisible(true)}
+        style={styles.settingRow}
+      >
+        <Text style={styles.label}>First Letter Style</Text>
+        <Text style={styles.value}>{letterModeLabels[letterMode]}</Text>
+      </TouchableOpacity>
 
-      <View style={styles.card}>
+      <Text style={styles.sectionHeader}>VERSE SETTINGS</Text>
+
+      <View style={styles.sliderContainer}>
         <Text style={styles.label}>Letters per Line: {chunkSize}</Text>
         <Slider
-          style={{ width: 250, height: 40 }}
+          style={{ width: '100%' }}
           minimumValue={4}
           maximumValue={20}
           step={1}
@@ -56,29 +89,80 @@ const SettingsScreen = () => {
           maximumTrackTintColor={theme.textColor}
           thumbTintColor={theme.textColor}
         />
-        <Text style={styles.helperText}>
-          Adjust how many letters appear per line in First Letter Mode.
-        </Text>
       </View>
 
-      <View style={styles.card}>
+      <TouchableOpacity
+        onPress={() => setTranslationModalVisible(true)}
+        style={styles.settingRow}
+      >
         <Text style={styles.label}>Translation</Text>
-        <Picker
-          selectedValue={translation}
-          onValueChange={setTranslation}
-          style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
-          dropdownIconColor={theme.textColor}
-        >
-          <Picker.Item label="English Standard Version (ESV)" value="de4e12af7f28f599-02" />
-          <Picker.Item label="King James Version (KJV)" value="06125adad2d5898a-01" />
-          <Picker.Item label="New International Version (NIV)" value="bba9f40183526463-01" />
-          <Picker.Item label="Christian Standard Bible (CSB)" value="46eecb412d56dfb7-02" />
-          <Picker.Item label="New Living Translation (NLT)" value="fa0eeb8af176a5c0-01" />
-        </Picker>
-        <Text style={styles.helperText}>
-          This will affect all loaded verses across the app.
+        <Text style={styles.value}>
+          {translationNames[translation] || 'Unknown'}
         </Text>
-      </View>
+      </TouchableOpacity>
+
+      <Text style={styles.versionText}>Version 1.0.0</Text>
+
+      {/* Letter Mode Modal */}
+      <Modal
+        visible={letterModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLetterModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setLetterModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            {letterModes.map((mode) => (
+              <TouchableOpacity
+                key={mode}
+                onPress={() => {
+                  setLetterMode(mode);
+                  setLetterModalVisible(false);
+                }}
+                style={styles.modalOption}
+              >
+                <Text style={styles.modalText}>
+                  {letterModeLabels[mode]}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Translation Modal */}
+      <Modal
+        visible={translationModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setTranslationModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setTranslationModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <FlatList
+              data={translationOptions}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setTranslation(item.value);
+                    setTranslationModalVisible(false);
+                  }}
+                  style={styles.modalOption}
+                >
+                  <Text style={styles.modalText}>{item.label}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -88,43 +172,71 @@ const getStyles = (theme, mode) =>
     container: {
       flex: 1,
       backgroundColor: theme.backgroundColor,
+      paddingHorizontal: 20,
       paddingTop: 60,
     },
     title: {
       fontSize: 28,
       fontWeight: 'bold',
       color: theme.textColor,
-      textAlign: 'center',
-      marginBottom: 30,
+      marginBottom: 20,
     },
-    label: {
-      color: theme.textColor,
-      fontSize: 16,
-      marginBottom: 12,
-      textAlign: 'center',
-    },
-    helperText: {
-      marginTop: 8,
+    sectionHeader: {
       fontSize: 13,
       color: theme.textColor,
       opacity: 0.6,
-      textAlign: 'center',
+      marginTop: 20,
+      marginBottom: 8,
     },
-    card: {
-      backgroundColor: mode === 'dark' ? '#2c2c2e' : '#f0f0f0',
-      borderRadius: 20,
-      padding: 20,
-      marginBottom: 20,
-      width: '90%',
-      alignSelf: 'center',
+    settingRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
     },
-    pickerIOS: {
-      height: 180,
+    label: {
+      fontSize: 16,
       color: theme.textColor,
     },
-    pickerAndroid: {
-      height: 50,
-      width: '100%',
+    value: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: theme.textColor,
+    },
+    sliderContainer: {
+      marginTop: 10,
+      marginBottom: 20,
+    },
+    versionText: {
+      marginTop: 40,
+      textAlign: 'center',
+      fontSize: 12,
+      color: theme.textColor,
+      opacity: 0.5,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      width: '80%',
+      maxHeight: '60%',
+      backgroundColor: theme.backgroundColor,
+      borderRadius: 10,
+      paddingVertical: 10,
+    },
+    modalOption: {
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    modalText: {
+      fontSize: 16,
       color: theme.textColor,
     },
   });

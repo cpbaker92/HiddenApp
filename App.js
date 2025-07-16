@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { ThemeProvider } from './ThemeContext';
 import { VerseProvider } from './src/VerseContext';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -73,17 +74,19 @@ function MainTabs() {
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <VerseProvider>
-        <VerseSettingsProvider>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-          <Stack.Screen name="Review" component={ReviewScreen} />
-          <Stack.Screen name="TypingMode" component={TypingModeScreen} />
-          <Stack.Screen name="QuizMode" component={QuizModeScreen} />
-          <Stack.Screen name="PromptMode" component={PromptModeScreen} />
-        </Stack.Navigator>
-        </VerseSettingsProvider>
-      </VerseProvider>
+      <ThemeProvider>
+        <VerseProvider>
+          <VerseSettingsProvider>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="MainTabs" component={MainTabs} />
+              <Stack.Screen name="Review" component={ReviewScreen} />
+              <Stack.Screen name="TypingMode" component={TypingModeScreen} />
+              <Stack.Screen name="QuizMode" component={QuizModeScreen} />
+              <Stack.Screen name="PromptMode" component={PromptModeScreen} />
+            </Stack.Navigator>
+          </VerseSettingsProvider>
+        </VerseProvider>
+      </ThemeProvider>
     </NavigationContainer>
   );
 }

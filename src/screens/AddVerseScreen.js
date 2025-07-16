@@ -7,14 +7,11 @@ import { fetchVerse } from '../../services/BibleAPI';
 import { useTheme } from '../../ThemeContext';
 import { useVerseSettings } from '../../VerseSettingsContext';
 
-const BIBLE_ID = 'de4e12af7f28f599-02'; // ESV
-
 const AddVerseScreen = () => {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
   const { translation } = useVerseSettings();
-  const bibleId = translation || BIBLE_ID;
+  const bibleId = translation;
   const styles = getStyles(theme);
-
   const [query, setQuery] = useState('');
   const [verseText, setVerseText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -89,7 +86,7 @@ const getStyles = (theme) =>
       borderRadius: 10,
       paddingHorizontal: 16,
       fontSize: 16,
-      backgroundColor: mode === 'dark' ? '#333' : '#fff',
+      backgroundColor: themeMode === 'dark' ? '#333' : '#fff',
       borderColor: theme.textColor,
       borderWidth: 1,
       marginBottom: 12,

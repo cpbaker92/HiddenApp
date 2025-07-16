@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useVerseSettings } from '../../VerseSettingsContext';
 
 const ReviewScreen = () => {
   const navigation = useNavigation();
@@ -11,11 +12,9 @@ const ReviewScreen = () => {
   const [selectedMode, setSelectedMode] = useState('Flashcard');
 
   useEffect(() => {
+    const { translation } = useVerseSettings();
+
     if (route.params?.reference && route.params?.text) {
-      setSelectedVerse({
-        reference: route.params.reference,
-        text: route.params.text,
-      });
     }
   }, [route.params]);
 
@@ -25,6 +24,7 @@ const ReviewScreen = () => {
     navigation.navigate(screenName, {
       reference: selectedVerse.reference,
       text: selectedVerse.text,
+      translation: selectedVerse.translation,
     });
   };
 
@@ -53,7 +53,9 @@ const ReviewScreen = () => {
       {selectedVerse ? (
         <>
           <View style={styles.verseBox}>
-            <Text style={styles.reference}>{selectedVerse.reference}</Text>
+            <Text style={styles.reference}>
+              {selectedVerse.reference} ({selectedVerse.translation})
+            </Text>
             <Text style={styles.text} numberOfLines={2}>
               {selectedVerse.text}
             </Text>
